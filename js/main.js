@@ -318,6 +318,9 @@ function applyNavData(nav) {
   if (!nav) return;
   const logo = document.getElementById('nav-logo');
   if (logo) logo.innerHTML = `${escapeHtml(nav.logoText)}<span style="color: var(--color-accent);">.</span>`;
+  
+  // Dynamically update browser tab title
+  document.title = `${nav.logoText} — Video Editor & Motion Designer`;
 }
 
 function applyHeroData(hero) {
