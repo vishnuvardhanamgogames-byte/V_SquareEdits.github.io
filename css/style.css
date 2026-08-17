@@ -2445,10 +2445,167 @@ html.custom-cursor-on * {
   .hero-scroll-arrow,
   .availability-dot {
     animation: none !important;
-  }
   *, *::before, *::after {
     transition-duration: 0.01ms !important;
     animation-duration:  0.01ms !important;
+  }
+}
+
+/* ── HERO PROFILE COMPONENT ────────────────────────────────────── */
+.hero-profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28px;
+  width: 100%;
+}
+
+.hero-avatar-wrapper {
+  position: relative;
+  cursor: pointer;
+  z-index: 10;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 16px;
+}
+
+.hero-avatar-float {
+  width: 100%;
+  height: 100%;
+  animation: floatBreathing 4.5s infinite ease-in-out;
+  will-change: transform;
+}
+
+.hero-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  background: #000;
+  will-change: transform;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Hover Scale Interaction */
+.hero-avatar-wrapper:hover .hero-avatar-img {
+  transform: scale(1.03);
+}
+
+/* Floating Animation Keyframes */
+@keyframes floatBreathing {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.018);
+  }
+}
+
+/* Status Availability Badge */
+.hero-status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  width: 190px;
+  height: 38px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.hero-status-badge:hover {
+  background: #080808;
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Glowing green dot */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.status-dot::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid #22c55e;
+  animation: statusPulse 1.8s infinite ease-out;
+  pointer-events: none;
+}
+
+@keyframes statusPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* Responsive Behavior */
+@media (max-width: 1024px) {
+  .hero-avatar-wrapper {
+    width: 180px;
+    height: 180px;
+  }
+  @keyframes floatBreathing {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-5px) scale(1.018);
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-avatar-wrapper {
+    width: 150px;
+    height: 150px;
+  }
+  @keyframes floatBreathing {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-4px) scale(1.015);
+    }
+  }
+}
+
+/* Prefers Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .hero-avatar-float {
+    animation: none !important;
+  }
+  .hero-avatar-img {
+    transition: none !important;
+  }
+  .hero-status-badge {
+    transition: none !important;
+  }
+  .status-dot::after {
+    animation: none !important;
   }
 }
 

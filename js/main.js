@@ -381,6 +381,12 @@ function applyAboutData(about) {
     img.src = about.portraitImage;
     img.alt = `Portrait of ${about.portraitCaption.split(' — ')[0]}`;
   }
+
+  const heroAvatarImg = document.getElementById('heroAvatarImg');
+  if (heroAvatarImg) {
+    heroAvatarImg.src = about.portraitImage;
+    heroAvatarImg.alt = `Portrait of ${about.portraitCaption.split(' — ')[0]}`;
+  }
   
   const caption = document.getElementById('about-portrait-caption');
   if (caption) caption.textContent = about.portraitCaption;
@@ -1329,6 +1335,42 @@ function initActiveNavLink() {
 }
 
 /* ============================================================
+   10b. PROFILE MOUSE PARALLAX
+   ============================================================ */
+function initProfileParallax() {
+  const wrapper = document.getElementById('heroAvatarWrapper');
+  const img = document.getElementById('heroAvatarImg');
+  if (!wrapper || !img) return;
+
+  const finePointer = window.matchMedia('(pointer: fine)').matches;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!finePointer || reducedMotion) return;
+
+  let request = null;
+
+  wrapper.addEventListener('mousemove', (e) => {
+    const rect = wrapper.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+
+    const moveX = (x / (rect.width / 2)) * 3.5;
+    const moveY = (y / (rect.height / 2)) * 3.5;
+
+    if (request) cancelAnimationFrame(request);
+    request = requestAnimationFrame(() => {
+      img.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.03)`;
+    });
+  });
+
+  wrapper.addEventListener('mouseleave', () => {
+    if (request) cancelAnimationFrame(request);
+    request = requestAnimationFrame(() => {
+      img.style.transform = 'translate(0px, 0px) scale(1)';
+    });
+  });
+}
+
+/* ============================================================
    INIT MASTER CONTROL ON DOM LOAD
    ============================================================ */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1351,4 +1393,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   initForm();
   initBackToTop();
   initActiveNavLink();
+  initProfileParallax();
 });
