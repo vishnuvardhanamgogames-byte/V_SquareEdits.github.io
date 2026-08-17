@@ -2,30 +2,550 @@
  * FrameFlow — Alex Mercer Portfolio
  * main.js
  *
- * Features:
- *  1. Lenis smooth scroll (respects prefers-reduced-motion)
- *  2. Custom cursor — 8px solid circle, mix-blend-difference, expands on video/projects
- *  3. Smooth scroll for nav links
- *  4. Nav background opacity on scroll
- *  5. IntersectionObserver fade-in-up animations
- *  6. Process steps: hover/click to change active step + description
- *  7. Showreel play button: toggles "playing" state
- *  8. Sound button: toggles aria-pressed
- *  9. Form submission: prevent default + show confirmation
- * 10. Mobile nav drawer toggle
- * 11. Active nav link highlight based on scroll position
+ * Fully dynamic website loading data from data.json or localStorage (CMS mode)
  */
 
 'use strict';
+
+/* ── Global State ────────────────────────────────────────────── */
+window.portfolioData = null;
+
+// Fallback defaults to ensure site loads immediately even if data.json is missing
+const DEFAULT_PORTFOLIO_DATA = {
+  "nav": {
+    "logoText": "ALEX MERCER"
+  },
+  "hero": {
+    "eyebrow": "VIDEO EDITOR — MOTION • STORY • IMPACT",
+    "headlineLines": ["CUTTING", "STORIES INTO", "MOTION."],
+    "subtext": "Video Editor & Motion Designer specializing in cinematic edits, social content, motion graphics and visual storytelling.",
+    "showreelVideo": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "showreelPoster": "public/images/projects/hero_workspace.jpg",
+    "showreelDuration": "01:00"
+  },
+  "marquee": ["EDIT", "DESIGN", "STORYTELL", "COLOR", "SOUND", "MOTION"],
+  "about": {
+    "headingLines": ["BEHIND", "THE EDIT"],
+    "portraitCaption": "ALEX MERCER — VIDEO EDITOR & MOTION DESIGNER",
+    "portraitImage": "public/images/profile/profile.jpg",
+    "bioParagraph1": "I'm a video editor focused on transforming raw footage into engaging visual stories. The timeline is where I think — pacing, rhythm and emotion are decided frame by frame.",
+    "bioParagraph2": "My work combines editing, motion graphics, visual effects, sound design and color to create videos that are visually strong and emotionally engaging. If it doesn't serve the story, it doesn't make the cut.",
+    "location": "Your City, Country",
+    "experience": "4+ Years",
+    "specialties": "Cinematic Edits / Motion Graphics / Color"
+  },
+  "services": [
+    {
+      "num": "01",
+      "title": "VIDEO EDITING",
+      "items": ["Cinematic Editing", "YouTube Editing", "Short-form Content", "Commercial Editing", "Trailer Editing"]
+    },
+    {
+      "num": "02",
+      "title": "MOTION GRAPHICS",
+      "items": ["Animated Typography", "Logo Animation", "UI Animation", "Transitions", "Infographics"]
+    },
+    {
+      "num": "03",
+      "title": "VISUAL EFFECTS",
+      "items": ["Compositing", "Green Screen", "Tracking", "Rotoscoping", "Screen Replacement"]
+    },
+    {
+      "num": "04",
+      "title": "COLOR",
+      "items": ["Color Correction", "Color Grading", "Look Development"]
+    },
+    {
+      "num": "05",
+      "title": "SOUND",
+      "items": ["Sound Design", "SFX", "Music Editing", "Audio Mixing"]
+    }
+  ],
+  "toolkit": {
+    "editing": ["Premiere Pro", "DaVinci Resolve"],
+    "motion": ["After Effects"],
+    "design": ["Photoshop", "Illustrator"],
+    "threeD": ["Blender"],
+    "audio": ["Audition"]
+  },
+  "process": [
+    { "title": "RAW FOOTAGE", "description": "Ingesting and logging every clip. Nothing gets lost, everything gets marked." },
+    { "title": "SELECTS",     "description": "Pulling the strongest moments — the takes with genuine energy." },
+    { "title": "ROUGH CUT",   "description": "Establishing structure, pacing and narrative flow." },
+    { "title": "FINE CUT",    "description": "Trimming to the frame. Rhythm becomes intention." },
+    { "title": "MOTION",      "description": "Adding typography, transitions and visual effects." },
+    { "title": "COLOR",       "description": "Creating consistency and developing the final visual mood." },
+    { "title": "SOUND",       "description": "Sound design, SFX and music mixed for impact." },
+    { "title": "FINAL",       "description": "Mastered, exported and delivered for every platform." }
+  ],
+  "experienceTimeline": [
+    {
+      "year": "2026",
+      "role": "VIDEO EDITOR",
+      "place": "FREELANCE",
+      "desc": "Leading end-to-end edits for brand and creator clients — from raw footage to final delivery."
+    },
+    {
+      "year": "2025",
+      "role": "MOTION DESIGN",
+      "place": "STUDIO PROJECTS",
+      "desc": "Animated typography, title sequences and motion systems for campaigns."
+    },
+    {
+      "year": "2024",
+      "role": "VIDEO EDITING",
+      "place": "FREELANCE",
+      "desc": "Short-form content, music edits and personal cinematic projects."
+    }
+  ],
+  "contact": {
+    "email": "hello@yourname.com",
+    "instagram": "https://instagram.com/yourhandle",
+    "youtube": "https://youtube.com/@yourhandle",
+    "linkedin": "https://linkedin.com/in/yourhandle",
+    "vimeo": "https://vimeo.com/yourhandle"
+  },
+  "projects": [
+    {
+      "index": "01",
+      "title": "Cinematic Trailer Edit",
+      "category": "Editing / Color Grading / Sound Design",
+      "role": "Editor / Colorist",
+      "software": "Premiere Pro, DaVinci Resolve, Audition",
+      "year": "2026",
+      "description": "A high-energy trailer cut built around rhythm and restraint — every beat mapped to the music, every transition earned. Graded for a cold, filmic finish with deep blacks and controlled highlights.",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      "image": "https://images.unsplash.com/photo-1771038396898-50c5bbbbfa67?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHw0fHxzcG9ydHMlMjBjYXIlMjBjb21tZXJjaWFsJTIwY2luZW1hdGljfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85",
+      "breakdown": {
+        "RAW": {
+          "image": "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=800&q=80",
+          "desc": "Flat S-Log3 footage straight from the camera, preserving all shadow and highlight details for grading."
+        },
+        "EDIT": {
+          "image": "https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80",
+          "desc": "Pacing edit matching high-impact cuts and narrative transitions to the trailer's sound design."
+        },
+        "COLOR": {
+          "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+          "desc": "A cold cinematic color grade with styled steel-blue midtones and clean, rolled highlights."
+        },
+        "MOTION": {
+          "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
+          "desc": "Kinetic tracked titles and kinetic text overlays positioned in 3D space."
+        },
+        "SOUND": {
+          "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80",
+          "desc": "Sub-bass impacts, risers, and detailed ambient sound design built from raw foley libraries."
+        },
+        "FINAL": {
+          "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80",
+          "desc": "The fully mastered 4K export, completed with theater-ready audio mixing and grading."
+        }
+      }
+    },
+    {
+      "index": "02",
+      "title": "Multifandom Cinematic Edit",
+      "category": "Music Editing / Transitions / VFX",
+      "role": "Editor / VFX",
+      "software": "Premiere Pro, After Effects",
+      "year": "2026",
+      "description": "A music-driven montage stitched from dozens of sources into one continuous visual flow — match cuts, velocity ramps and seamless masked transitions synced to the track.",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+      "image": "https://images.unsplash.com/photo-1695192721582-5660bca08424?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MDV8MHwxfHNlYXJjaHwyfHxtdXNpYyUyMHZpZGVvJTIwYWVzdGhldGljfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85",
+      "breakdown": {
+        "RAW": {
+          "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80",
+          "desc": "A mix of standard-definition and high-definition sources before aspect-ratio and resolution matching."
+        },
+        "EDIT": {
+          "image": "https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80",
+          "desc": "Stitching hundreds of clips using match cuts and visual speed ramps to form a continuous visual flow."
+        },
+        "COLOR": {
+          "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+          "desc": "A vibrant, stylized color grade to bring various visual sources into a single coherent visual palette."
+        },
+        "MOTION": {
+          "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
+          "desc": "Seamless invisible mask transitions and localized particle/light leak overlay effects."
+        },
+        "SOUND": {
+          "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80",
+          "desc": "Precision-synced audio beat mapping and vocal isolation/mixing from source tracks."
+        },
+        "FINAL": {
+          "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80",
+          "desc": "The fully rendered high-frame-rate master with smooth motion-blurred transitions."
+        }
+      }
+    },
+    {
+      "index": "03",
+      "title": "Motion Graphics Advertisement",
+      "category": "Editing / Motion Graphics / After Effects",
+      "role": "Motion Designer / Editor",
+      "software": "After Effects, Premiere Pro, Photoshop",
+      "year": "2025",
+      "description": "A punchy 30-second product spot built entirely from animated typography, shape systems and rhythm — designed to land the message with the sound off.",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+      "image": "https://images.unsplash.com/photo-1532170579297-281918c8ae72?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2OTV8MHwxfHNlYXJjaHw0fHxjaW5lbWF0aWMlMjBwb3J0cmFpdCUyMGRhcmslMjBtb29kfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85",
+      "breakdown": {
+        "RAW": {
+          "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80",
+          "desc": "Initial vector layouts and raw storyboard graphics designed in Adobe Illustrator."
+        },
+        "EDIT": {
+          "image": "https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80",
+          "desc": "Pacing typography overlays and setting up keyframe timings for fluid kinetic animations."
+        },
+        "COLOR": {
+          "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+          "desc": "Adjusting contrast and applying branding color LUTs for visual consistency across products."
+        },
+        "MOTION": {
+          "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
+          "desc": "Custom 3D camera paths, vector morphing, and complex shape layer transitions in After Effects."
+        },
+        "SOUND": {
+          "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80",
+          "desc": "Synchronized cartoon sound effects, clicks, and a dynamic upbeat background music track."
+        },
+        "FINAL": {
+          "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80",
+          "desc": "The compressed 1080p MP4 final deliverable optimized for web and social media ad placements."
+        }
+      }
+    },
+    {
+      "index": "04",
+      "title": "Social Media Campaign",
+      "category": "Short-form Editing / Typography / Sound Design",
+      "role": "Editor / Sound Designer",
+      "software": "Premiere Pro, After Effects, Audition",
+      "year": "2025",
+      "description": "A 12-piece short-form series engineered for retention — hooks inside the first second, burned-in kinetic captions and sound design that carries the scroll-stopping energy.",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+      "image": "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTV8MHwxfHNlYXJjaHwxfHxjb21tZXJjaWFsJTIwZmlsbSUyMGNvbG9yJTIwZ3JhZGluZ3xlbnwwfHx8fDE3ODY2MTM2Nzh8MA&ixlib=rb-4.1.0&q=85",
+      "breakdown": {
+        "RAW": {
+          "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80",
+          "desc": "Vertical smartphone clips and raw interview takes captured under varied lighting environments."
+        },
+        "EDIT": {
+          "image": "https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80",
+          "desc": "Aggressive hook-based pacing to optimize audience retention within the first three seconds."
+        },
+        "COLOR": {
+          "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+          "desc": "High-contrast correction to make the subjects stand out on mobile screens and feeds."
+        },
+        "MOTION": {
+          "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
+          "desc": "Bold, branded kinetic captions and pop-up vector elements for increased visual engagement."
+        },
+        "SOUND": {
+          "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80",
+          "desc": "Clean dialogue equalization, noise reduction, and ducked trending background audio tracks."
+        },
+        "FINAL": {
+          "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80",
+          "desc": "Vertical 9:16 final deliverable, optimized and formatted for social platform algorithms."
+        }
+      }
+    }
+  ]
+};
 
 /* ── Utility ─────────────────────────────────────────────────── */
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
+function escapeHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* ============================================================
+   DATA LOADING & POPULATING
+   ============================================================ */
+async function initPortfolioData() {
+  // 1. Try LocalStorage for preview edits
+  try {
+    const local = localStorage.getItem('portfolio_data');
+    if (local) {
+      window.portfolioData = JSON.parse(local);
+    }
+  } catch (e) {
+    console.error('Failed to read from localStorage', e);
+  }
+
+  // 2. Try Fetch data.json
+  if (!window.portfolioData) {
+    try {
+      const res = await fetch('data.json');
+      if (res.ok) {
+        window.portfolioData = await res.json();
+      }
+    } catch (e) {
+      console.warn('data.json not found, using defaults', e);
+    }
+  }
+
+  // 3. Fallback to hardcoded defaults
+  if (!window.portfolioData) {
+    window.portfolioData = DEFAULT_PORTFOLIO_DATA;
+  }
+
+  // Apply configs to static text elements in HTML
+  applyNavData(window.portfolioData.nav);
+  applyHeroData(window.portfolioData.hero);
+  applyMarqueeData(window.portfolioData.marquee);
+  applyAboutData(window.portfolioData.about);
+  applyServicesData(window.portfolioData.services);
+  applyToolkitData(window.portfolioData.toolkit);
+  applyExperienceData(window.portfolioData.experienceTimeline);
+  applyContactData(window.portfolioData.contact);
+  
+  // Render projects
+  renderProjects(window.portfolioData.projects);
+}
+
+function applyNavData(nav) {
+  if (!nav) return;
+  const logo = document.getElementById('nav-logo');
+  if (logo) logo.innerHTML = `${escapeHtml(nav.logoText)}<span style="color: var(--color-accent);">.</span>`;
+}
+
+function applyHeroData(hero) {
+  if (!hero) return;
+  const eyebrow = document.getElementById('hero-eyebrow');
+  if (eyebrow) {
+    eyebrow.innerHTML = `<span class="hero-eyebrow-dot" aria-hidden="true"></span>${escapeHtml(hero.eyebrow)}`;
+  }
+  
+  const headline = document.getElementById('hero-headline');
+  if (headline) {
+    headline.innerHTML = hero.headlineLines.map((line, idx) => {
+      const delay = 0.25 + idx * 0.13;
+      const isAccent = idx === hero.headlineLines.length - 1;
+      return `<span class="hero-line${isAccent ? ' accent-line' : ''}"><span class="hero-line-inner" style="--delay:${delay}s">${escapeHtml(line)}</span></span>`;
+    }).join('\n');
+    headline.setAttribute('aria-label', hero.headlineLines.join(' '));
+  }
+  
+  const subtext = document.getElementById('hero-subtext');
+  if (subtext) subtext.textContent = hero.subtext;
+  
+  const video = document.getElementById('showreelVideo');
+  if (video) {
+    video.src = hero.showreelVideo;
+    if (hero.showreelPoster) video.poster = hero.showreelPoster;
+  }
+  
+  const duration = document.getElementById('showreel-duration');
+  if (duration) duration.textContent = hero.showreelDuration;
+}
+
+function applyMarqueeData(marquee) {
+  if (!marquee || !marquee.length) return;
+  const track = document.querySelector('.marquee-track');
+  if (!track) return;
+  
+  const itemsHtml = marquee.map((word, idx) => {
+    const isOutline = idx % 2 === 1;
+    return `<span class="marquee-item"><span class="marquee-word${isOutline ? ' marquee-outline' : ''}">${escapeHtml(word)}</span><span class="marquee-sep">•</span></span>`;
+  }).join('');
+  
+  track.innerHTML = itemsHtml + itemsHtml; // duplicate for seamless loop
+}
+
+function applyAboutData(about) {
+  if (!about) return;
+  const heading = document.getElementById('about-heading');
+  if (heading) {
+    heading.innerHTML = about.headingLines.map((line, idx) => {
+      const delay = idx * 0.13;
+      return `<span class="line"><span class="line-inner" style="--line-delay:${delay}s">${escapeHtml(line)}</span></span>`;
+    }).join('\n');
+  }
+  
+  const img = document.getElementById('about-image');
+  if (img) {
+    img.src = about.portraitImage;
+    img.alt = `Portrait of ${about.portraitCaption.split(' — ')[0]}`;
+  }
+  
+  const caption = document.getElementById('about-portrait-caption');
+  if (caption) caption.textContent = about.portraitCaption;
+  
+  const bio1 = document.getElementById('about-bio-1');
+  if (bio1) bio1.textContent = about.bioParagraph1;
+  
+  const bio2 = document.getElementById('about-bio-2');
+  if (bio2) bio2.textContent = about.bioParagraph2;
+  
+  const location = document.getElementById('about-location');
+  if (location) location.textContent = about.location;
+  
+  const experience = document.getElementById('about-experience');
+  if (experience) experience.textContent = about.experience;
+  
+  const specialties = document.getElementById('about-specialties');
+  if (specialties) specialties.textContent = about.specialties;
+}
+
+function applyServicesData(services) {
+  if (!services || !services.length) return;
+  const list = document.getElementById('services-list');
+  if (!list) return;
+  
+  list.innerHTML = services.map((s, idx) => {
+    const delay = idx * 0.05;
+    const itemsHtml = s.items.map(item => `<li>${escapeHtml(item)}</li>`).join('\n');
+    return `
+      <div class="service-row reveal" style="--reveal-delay:${delay}s" data-testid="service-${s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}">
+        <span class="service-row-number">${s.num || String(idx + 1).padStart(2, '0')}</span>
+        <h3 class="service-row-title">${escapeHtml(s.title)}</h3>
+        <ul class="service-row-items" role="list">
+          ${itemsHtml}
+        </ul>
+      </div>
+    `;
+  }).join('\n');
+}
+
+function applyToolkitData(toolkit) {
+  if (!toolkit) return;
+  const grid = document.getElementById('software-grid');
+  if (!grid) return;
+  
+  const categories = [
+    { key: 'editing', label: 'EDITING', testId: 'software-editing' },
+    { key: 'motion', label: 'MOTION', testId: 'software-motion' },
+    { key: 'design', label: 'DESIGN', testId: 'software-design' },
+    { key: 'threeD', label: '3D', testId: 'software-3d' },
+    { key: 'audio', label: 'AUDIO', testId: 'software-audio' }
+  ];
+  
+  grid.innerHTML = categories.map(cat => {
+    const tools = toolkit[cat.key] || [];
+    const toolsHtml = tools.map(t => `<li>${escapeHtml(t)}</li>`).join('\n');
+    return `
+      <div class="software-card" data-testid="${cat.testId}">
+        <span class="software-cat">${cat.label}</span>
+        <ul class="software-tools">
+          ${toolsHtml}
+        </ul>
+      </div>
+    `;
+  }).join('\n');
+}
+
+function applyExperienceData(timeline) {
+  if (!timeline || !timeline.length) return;
+  const container = document.getElementById('experience-timeline');
+  if (!container) return;
+  
+  container.innerHTML = timeline.map((item, idx) => {
+    const delay = idx * 0.06;
+    return `
+      <div class="timeline-item reveal" style="--reveal-delay:${delay}s">
+        <div class="timeline-year">${escapeHtml(item.year)}</div>
+        <div class="timeline-role-wrap">
+          <h3 class="timeline-role">${escapeHtml(item.role)}</h3>
+          <p class="timeline-place">${escapeHtml(item.place)}</p>
+        </div>
+        <p class="timeline-desc">${escapeHtml(item.desc)}</p>
+      </div>
+    `;
+  }).join('\n');
+}
+
+function applyContactData(contact) {
+  if (!contact) return;
+  
+  const emailText = document.getElementById('contact-email');
+  if (emailText) emailText.textContent = contact.email;
+  
+  const socials = ['instagram', 'youtube', 'linkedin', 'vimeo'];
+  socials.forEach(s => {
+    const url = contact[s];
+    if (!url) return;
+    
+    const link = document.getElementById(`social-${s}`);
+    if (link) link.href = url;
+    
+    const footLink = document.getElementById(`footer-social-${s}`);
+    if (footLink) footLink.href = url;
+  });
+  
+  // Footer Brand Name / Titles
+  const footerName = document.getElementById('footer-name');
+  if (footerName) {
+    const name = window.portfolioData.nav ? window.portfolioData.nav.logoText : 'ALEX MERCER';
+    footerName.innerHTML = `&copy; ${new Date().getFullYear()} ${escapeHtml(name)}`;
+  }
+  
+  const footerTitle = document.getElementById('footer-title');
+  if (footerTitle) {
+    const title = window.portfolioData.hero ? window.portfolioData.hero.eyebrow.split(' — ')[1] || window.portfolioData.hero.eyebrow : 'VIDEO EDITOR / MOTION DESIGNER';
+    footerTitle.textContent = title;
+  }
+}
+
+function renderProjects(projects) {
+  const container = document.getElementById('projects-list');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  projects.forEach((p, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'project-row reveal';
+    btn.setAttribute('data-testid', `project-card-${p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`);
+    btn.setAttribute('data-cursor', 'VIEW');
+    btn.setAttribute('data-project', idx);
+    btn.setAttribute('aria-label', `View project: ${p.title}`);
+    btn.style.setProperty('--reveal-delay', `${idx * 0.05}s`);
+    
+    btn.innerHTML = `
+      <span class="project-row-index">${p.index || String(idx + 1).padStart(2, '0')}</span>
+
+      <div class="project-row-image-wrap">
+        <div class="project-row-image-inner">
+          <img
+            src="${p.image || ''}"
+            alt="${p.title}"
+            loading="lazy"
+            class="project-row-img"
+          />
+        </div>
+        <span class="project-row-redline" aria-hidden="true"></span>
+      </div>
+
+      <div class="project-row-info">
+        <h3 class="project-row-title">${escapeHtml(p.title)}</h3>
+        <p class="project-row-category">${escapeHtml(p.category)}</p>
+      </div>
+
+      <div class="project-row-meta">
+        <span class="project-row-year">${escapeHtml(p.year)}</span>
+        <svg class="project-row-arrow" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+        </svg>
+      </div>
+    `;
+    container.appendChild(btn);
+  });
+}
+
 /* ============================================================
    1. LENIS SMOOTH SCROLL
    ============================================================ */
-(function initLenis() {
+function initLenis() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   function startLenis() {
@@ -38,13 +558,12 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   }
 
   startLenis();
-})();
-
+}
 
 /* ============================================================
    1b. HERO PARALLAX + FADE ON SCROLL + MASK REVEAL TRIGGER
    ============================================================ */
-(function initHero() {
+function initHero() {
   const heroBg      = document.getElementById('heroBg');
   const heroContent = document.getElementById('heroContent');
   const hero        = document.getElementById('top');
@@ -73,17 +592,12 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
       heroContent.style.opacity = String(1 - fadeProgress);
     }
   }, { passive: true });
-})();
+}
 
 /* ============================================================
-   2. CUSTOM CURSOR — matches CustomCursor.jsx
-      - pointer: fine check (not hover: hover)
-      - spring physics: stiffness 520, damping 42, mass 0.5
-      - 12px default, 88px expanded
-      - reads data-cursor attribute for label text
-      - adds .custom-cursor-on to <html> for cursor:none
+   2. CUSTOM CURSOR
    ============================================================ */
-(function initCursor() {
+function initCursor() {
   const fine    = window.matchMedia('(pointer: fine)').matches;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!fine || reduced) return;
@@ -91,17 +605,17 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   const cursor = document.getElementById('cursor');
   if (!cursor) return;
 
-  // Inject label span
+  // Clean old label if re-running
+  const oldLabel = cursor.querySelector('.cursor-label');
+  if (oldLabel) oldLabel.remove();
+
   const label = document.createElement('span');
   label.className = 'cursor-label';
   label.setAttribute('aria-hidden', 'true');
   cursor.appendChild(label);
 
-  // Add class to html so CSS sets cursor:none everywhere
   document.documentElement.classList.add('custom-cursor-on');
 
-  // Spring state — approximate framer-motion spring(stiffness:520, damping:42, mass:0.5)
-  // Critically-damped approximation: higher alpha = stiffer/faster
   let mouseX = -100, mouseY = -100;
   let curX   = -100, curY   = -100;
   let velX   = 0,    velY   = 0;
@@ -118,7 +632,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; });
 
   (function loop() {
-    // Spring integration (Euler)
     const ax = (-stiffness * (curX - mouseX) - damping * velX) / mass;
     const ay = (-stiffness * (curY - mouseY) - damping * velY) / mass;
     velX += ax * dt;
@@ -131,7 +644,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     requestAnimationFrame(loop);
   })();
 
-  // Read data-cursor attribute on hovered element (matches React impl)
   document.addEventListener('mouseover', (e) => {
     const target = e.target.closest?.('[data-cursor]');
     const cursorLabel = target ? target.getAttribute('data-cursor') : null;
@@ -147,24 +659,20 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
       label.textContent = '';
     }
   });
-})();
-
+}
 
 /* ============================================================
    2 & 3. SMOOTH SCROLL + NAV OPACITY ON SCROLL
    ============================================================ */
-(function initNav() {
+function initNav() {
   const nav         = $('#nav');
   const hamburger   = $('#navHamburger');
   const drawer      = $('#navDrawer');
-  const drawerLinks = $$('.drawer-link');
 
-  // -- Smooth scroll for all in-page anchor links --
   function smoothScrollTo(targetId) {
     const target = document.getElementById(targetId);
     if (!target) return;
 
-    // Use Lenis if available, otherwise native
     if (window.__lenis) {
       window.__lenis.scrollTo(target, { offset: -(nav ? nav.getBoundingClientRect().height : 72) });
     } else {
@@ -174,6 +682,7 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     }
   }
 
+  // Use event delegation for all hash links
   document.addEventListener('click', (e) => {
     const link = e.target.closest('a[href^="#"]');
     if (!link) return;
@@ -187,12 +696,9 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
     e.preventDefault();
     smoothScrollTo(targetId);
-
-    // Close mobile drawer if open
     closeDrawer();
   });
 
-  // -- Nav background opacity on scroll --
   if (nav) {
     const onScroll = () => {
       if (window.scrollY > 40) {
@@ -201,12 +707,10 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
         nav.classList.remove('scrolled');
       }
     };
-
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // run once on load
+    onScroll();
   }
 
-  // -- Mobile hamburger --
   function openDrawer() {
     drawer.classList.add('open');
     drawer.setAttribute('aria-hidden', 'false');
@@ -216,6 +720,7 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   }
 
   function closeDrawer() {
+    if (!drawer) return;
     drawer.classList.remove('open');
     drawer.setAttribute('aria-hidden', 'true');
     hamburger.classList.remove('open');
@@ -224,27 +729,24 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   }
 
   if (hamburger) {
-    hamburger.addEventListener('click', () => {
+    // Clear old listeners by cloning
+    const newHamburger = hamburger.cloneNode(true);
+    hamburger.parentNode.replaceChild(newHamburger, hamburger);
+    newHamburger.addEventListener('click', () => {
       const isOpen = drawer.classList.contains('open');
       isOpen ? closeDrawer() : openDrawer();
     });
   }
 
-  // Close drawer when a link is clicked (handled in click delegation above)
-  // Also close on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeDrawer();
   });
-})();
+}
 
-
-/* ============================================================
 /* ============================================================
    4. INTERSECTIONOBSERVER — REVEAL + MASKED HEADING ANIMATIONS
-      Matches Framer Motion's FadeUp (opacity+y) and
-      MaskedLines (clip from y:115%) from Reveal.jsx
    ============================================================ */
-(function initReveal() {
+function initReveal() {
   const elements = $$('.reveal');
   if (!elements.length) return;
 
@@ -256,7 +758,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
         const el = entry.target;
         el.classList.add('visible');
 
-        // If heading has .line-inner children, trigger their mask reveal
         el.querySelectorAll('.line-inner').forEach((inner) => {
           inner.style.transform = 'translateY(0%)';
         });
@@ -266,13 +767,12 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     },
     {
       threshold: 0.08,
-      rootMargin: '0px 0px -60px 0px', // matches viewport: { margin: "-60px" }
+      rootMargin: '0px 0px -60px 0px',
     }
   );
 
   elements.forEach((el) => observer.observe(el));
 
-  // Also observe section-label elements for FadeUp
   $$('.section-label').forEach((el) => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(44px)';
@@ -291,161 +791,12 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     );
     labelObserver.observe(el);
   });
-})();
-
+}
 
 /* ============================================================
-   4b. PROJECT MODAL — open/close + populate from portfolio data
+   4b. PROJECT MODAL
    ============================================================ */
-(function initProjectModal() {
-  // Project data matching portfolio.js
-  const projects = [
-    {
-      index: '01',
-      title: 'Cinematic Trailer Edit',
-      category: 'Editing / Color Grading / Sound Design',
-      role: 'Editor / Colorist',
-      software: 'Premiere Pro, DaVinci Resolve, Audition',
-      year: '2026',
-      description: 'A high-energy trailer cut built around rhythm and restraint — every beat mapped to the music, every transition earned. Graded for a cold, filmic finish with deep blacks and controlled highlights.',
-      video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-      breakdown: {
-        RAW: {
-          image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=800&q=80',
-          desc: 'Flat S-Log3 footage straight from the camera, preserving all shadow and highlight details for grading.'
-        },
-        EDIT: {
-          image: 'https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80',
-          desc: "Pacing edit matching high-impact cuts and narrative transitions to the trailer's sound design."
-        },
-        COLOR: {
-          image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
-          desc: 'A cold cinematic color grade with styled steel-blue midtones and clean, rolled highlights.'
-        },
-        MOTION: {
-          image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
-          desc: 'Minimalist tracked titles and kinetic text overlays positioned in 3D space.'
-        },
-        SOUND: {
-          image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80',
-          desc: 'Sub-bass impacts, risers, and detailed ambient sound design built from raw foley libraries.'
-        },
-        FINAL: {
-          image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80',
-          desc: 'The fully mastered 4K export, completed with theater-ready audio mixing and grading.'
-        }
-      }
-    },
-    {
-      index: '02',
-      title: 'Multifandom Cinematic Edit',
-      category: 'Music Editing / Transitions / VFX',
-      role: 'Editor / VFX',
-      software: 'Premiere Pro, After Effects',
-      year: '2026',
-      description: 'A music-driven montage stitched from dozens of sources into one continuous visual flow — match cuts, velocity ramps and seamless masked transitions synced to the track.',
-      video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-      breakdown: {
-        RAW: {
-          image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80',
-          desc: 'A mix of standard-definition and high-definition sources before aspect-ratio and resolution matching.'
-        },
-        EDIT: {
-          image: 'https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80',
-          desc: 'Stitching hundreds of clips using match cuts and visual speed ramps to form a continuous visual flow.'
-        },
-        COLOR: {
-          image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
-          desc: 'A vibrant, stylized color grade to bring various visual sources into a single coherent visual palette.'
-        },
-        MOTION: {
-          image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
-          desc: 'Seamless invisible mask transitions and localized particle/light leak overlay effects.'
-        },
-        SOUND: {
-          image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80',
-          desc: 'Precision-synced audio beat mapping and vocal isolation/mixing from source tracks.'
-        },
-        FINAL: {
-          image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80',
-          desc: 'The fully rendered high-frame-rate master with smooth motion-blurred transitions.'
-        }
-      }
-    },
-    {
-      index: '03',
-      title: 'Motion Graphics Advertisement',
-      category: 'Editing / Motion Graphics / After Effects',
-      role: 'Motion Designer / Editor',
-      software: 'After Effects, Premiere Pro, Photoshop',
-      year: '2025',
-      description: 'A punchy 30-second product spot built entirely from animated typography, shape systems and rhythm — designed to land the message with the sound off.',
-      video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-      breakdown: {
-        RAW: {
-          image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80',
-          desc: 'Initial vector layouts and raw storyboard graphics designed in Adobe Illustrator.'
-        },
-        EDIT: {
-          image: 'https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80',
-          desc: 'Pacing typography overlays and setting up keyframe timings for fluid kinetic animations.'
-        },
-        COLOR: {
-          image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
-          desc: 'Adjusting contrast and applying branding color LUTs for visual consistency across products.'
-        },
-        MOTION: {
-          image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
-          desc: 'Custom 3D camera paths, vector morphing, and complex shape layer transitions in After Effects.'
-        },
-        SOUND: {
-          image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80',
-          desc: 'Synchronized cartoon sound effects, clicks, and a dynamic upbeat background music track.'
-        },
-        FINAL: {
-          image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80',
-          desc: 'The compressed 1080p MP4 final deliverable optimized for web and social media ad placements.'
-        }
-      }
-    },
-    {
-      index: '04',
-      title: 'Social Media Campaign',
-      category: 'Short-form Editing / Typography / Sound Design',
-      role: 'Editor / Sound Designer',
-      software: 'Premiere Pro, After Effects, Audition',
-      year: '2025',
-      description: 'A 12-piece short-form series engineered for retention — hooks inside the first second, burned-in kinetic captions and sound design that carries the scroll-stopping energy.',
-      video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
-      breakdown: {
-        RAW: {
-          image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80',
-          desc: 'Vertical smartphone clips and raw interview takes captured under varied lighting environments.'
-        },
-        EDIT: {
-          image: 'https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80',
-          desc: 'Aggressive hook-based pacing to optimize audience retention within the first three seconds.'
-        },
-        COLOR: {
-          image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
-          desc: 'High-contrast correction to make the subjects stand out on mobile screens and feeds.'
-        },
-        MOTION: {
-          image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
-          desc: 'Bold, branded kinetic captions and pop-up vector elements for increased visual engagement.'
-        },
-        SOUND: {
-          image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80',
-          desc: 'Clean dialogue equalization, noise reduction, and ducked trending background audio tracks.'
-        },
-        FINAL: {
-          image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80',
-          desc: 'Vertical 9:16 final deliverable, optimized and formatted for social platform algorithms.'
-        }
-      }
-    },
-  ];
-
+function initProjectModal() {
   const modal     = $('#projectModal');
   const backdrop  = $('#modalBackdrop');
   const closeBtn  = $('#modalClose');
@@ -457,6 +808,7 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   let currentProjectIdx = 0;
 
   function renderBreakdown(tab) {
+    const projects = window.portfolioData.projects;
     const p = projects[currentProjectIdx];
     const data = p && p.breakdown ? p.breakdown[tab] : null;
     const mediaCol = $('#modalBreakdownMedia');
@@ -473,14 +825,14 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   }
 
   function openModal(idx) {
+    const projects = window.portfolioData.projects;
     const p = projects[idx];
     if (!p) return;
 
     currentProjectIdx = idx;
 
-    // Populate fields
     const modalIdxTag = $('#modalIndexTag');
-    if (modalIdxTag) modalIdxTag.textContent = 'PROJECT ' + p.index;
+    if (modalIdxTag) modalIdxTag.textContent = 'PROJECT ' + (p.index || String(idx + 1).padStart(2, '0'));
     $('#modalTitle').textContent       = p.title;
     $('#modalCategory').textContent    = p.category;
     $('#modalDescription').textContent = p.description;
@@ -493,7 +845,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
       modalVideo.load();
     }
 
-    // Reset tabs to RAW
     tabs.forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.tab === 'RAW');
     });
@@ -502,7 +853,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     modal.hidden    = false;
     backdrop.hidden = false;
 
-    // Animate in next frame
     requestAnimationFrame(() => {
       modal.classList.add('open');
       backdrop.classList.add('open');
@@ -521,7 +871,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
       modalVideo.src = '';
     }
 
-    // Hide after transition
     setTimeout(() => {
       modal.hidden    = true;
       backdrop.hidden = true;
@@ -529,15 +878,15 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     }, 400);
   }
 
-  // Wire up project rows
-  $$('.project-row').forEach((row) => {
-    row.addEventListener('click', () => {
+  // Use event delegation for project rows click so dynamic load works
+  document.addEventListener('click', (e) => {
+    const row = e.target.closest('.project-row');
+    if (row) {
       const idx = parseInt(row.dataset.project, 10);
       openModal(idx);
-    });
+    }
   });
 
-  // Wire up breakdown tabs
   tabs.forEach((tabBtn) => {
     tabBtn.addEventListener('click', () => {
       tabs.forEach((btn) => btn.classList.remove('active'));
@@ -547,39 +896,24 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     });
   });
 
-  // Close button
   if (closeBtn) closeBtn.addEventListener('click', closeModal);
-
-  // Backdrop click to close
   if (backdrop) backdrop.addEventListener('click', closeModal);
 
-  // Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
   });
-})();
-
+}
 
 /* ============================================================
-   5. PROCESS STEPS — HOVER/CLICK TO CHANGE ACTIVE + DESCRIPTION
+   5. PROCESS STEPS
    ============================================================ */
-(function initProcess() {
+function initProcess() {
   const cards  = $$('.process-card');
   const descEl = $('#processDescText');
 
   if (!cards.length || !descEl) return;
 
-  // step index → { title, description } — from portfolio.js data
-  const steps = [
-    { title: 'RAW FOOTAGE', description: 'Ingesting and logging every clip. Nothing gets lost, everything gets marked.' },
-    { title: 'SELECTS',     description: 'Pulling the strongest moments — the takes with genuine energy.' },
-    { title: 'ROUGH CUT',   description: 'Establishing structure, pacing and narrative flow.' },
-    { title: 'FINE CUT',    description: 'Trimming to the frame. Rhythm becomes intention.' },
-    { title: 'MOTION',      description: 'Adding typography, transitions and visual effects.' },
-    { title: 'COLOR',       description: 'Creating consistency and developing the final visual mood.' },
-    { title: 'SOUND',       description: 'Sound design, SFX and music mixed for impact.' },
-    { title: 'FINAL',       description: 'Mastered, exported and delivered for every platform.' },
-  ];
+  const steps = window.portfolioData.process;
 
   function setActiveStep(index) {
     cards.forEach((card, i) => {
@@ -588,37 +922,35 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
       card.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
 
-    // Fade out → swap content → fade in
     descEl.classList.add('fade-out');
     setTimeout(() => {
       const { title, description } = steps[index] || steps[0];
-      descEl.innerHTML = `<span class="process-desc-title">${title}</span>${description}`;
+      descEl.innerHTML = `<span class="process-desc-title">${escapeHtml(title)}</span>${escapeHtml(description)}`;
       descEl.classList.remove('fade-out');
     }, 220);
   }
 
+  // Clear and update title text for steps based on config
+  cards.forEach((card, i) => {
+    const stepData = steps[i];
+    if (stepData) {
+      const titleSpan = card.querySelector('.process-card-title');
+      if (titleSpan) titleSpan.textContent = stepData.title;
+    }
+  });
+
   cards.forEach((card) => {
     const idx = parseInt(card.dataset.step, 10);
-    // Both hover and click activate the step (matching React component)
     card.addEventListener('mouseenter', () => setActiveStep(idx));
     card.addEventListener('focus',      () => setActiveStep(idx));
     card.addEventListener('click',      () => setActiveStep(idx));
   });
-})();
-
+}
 
 /* ============================================================
-   6. SHOWREEL PLAYER — full ShowreelPlayer.jsx equivalent
-      - Big play overlay
-      - Pointer-drag seek with scrubber thumb
-      - Arrow key seeking
-      - Play/Pause icons swap
-      - Mute/Unmute with Volume icons
-      - Fullscreen
-      - Error state
-      - play-showreel custom event
+   6. SHOWREEL PLAYER
    ============================================================ */
-(function initShowreelPlayer() {
+function initShowreelPlayer() {
   const wrap       = $('#videoWrap');
   const video      = $('#showreelVideo');
   const bigPlay    = $('#videoBigPlay');
@@ -626,7 +958,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   const labelDot   = $('#videoLabelDot');
   const progressWrap = $('#videoProgress');
   const progressFill = $('#videoProgressFill');
-  const thumb        = $('#videoThumb');
   const timeEl       = $('#videoTime');
   const toggleBtn    = $('#videoToggleBtn');
   const muteBtn      = $('#videoMuteBtn');
@@ -636,7 +967,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
   if (!video || !wrap) return;
 
-  // Icons
   const iconPlay  = toggleBtn?.querySelector('.icon-play');
   const iconPause = toggleBtn?.querySelector('.icon-pause');
   const iconVolOn  = muteBtn?.querySelector('.icon-vol-on');
@@ -692,7 +1022,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     video.play().catch(() => {});
   }
 
-  // Hero button
   if (showreelBtn) {
     showreelBtn.addEventListener('click', () => {
       scrollToWork();
@@ -700,10 +1029,8 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     });
   }
 
-  // play-showreel event
   window.addEventListener('play-showreel', startVideo, { once: true });
 
-  // Big play overlay + video click → toggle
   [bigPlay, video].forEach((el) => {
     if (el) el.addEventListener('click', () => {
       if (video.paused) {
@@ -715,7 +1042,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     });
   });
 
-  // Video events
   video.addEventListener('play',    () => setPlaying(true));
   video.addEventListener('pause',   () => setPlaying(false));
   video.addEventListener('ended',   () => setPlaying(false));
@@ -728,7 +1054,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     if (bigPlay)    bigPlay.hidden    = true;
   });
 
-  // Progress bar — pointer drag + click
   if (progressWrap) {
     progressWrap.addEventListener('pointerdown', (e) => {
       seeking = true;
@@ -738,7 +1063,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     progressWrap.addEventListener('pointermove', (e) => { if (seeking) seekTo(e.clientX); });
     progressWrap.addEventListener('pointerup',   () => { seeking = false; });
 
-    // Arrow key seeking
     progressWrap.addEventListener('keydown', (e) => {
       if (!video.duration) return;
       if (e.key === 'ArrowRight') video.currentTime = Math.min(video.duration, video.currentTime + 5);
@@ -747,7 +1071,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     });
   }
 
-  // Mute toggle
   if (muteBtn) {
     muteBtn.addEventListener('click', () => {
       video.muted = !video.muted;
@@ -757,27 +1080,24 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     });
   }
 
-  // Toggle button
   if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
       video.paused ? video.play().catch(() => {}) : video.pause();
     });
   }
 
-  // Fullscreen
   if (fsBtn) {
     fsBtn.addEventListener('click', () => {
       if (document.fullscreenElement) document.exitFullscreen();
       else wrap.requestFullscreen?.();
     });
   }
-})();
-
+}
 
 /* ============================================================
    7. COPY EMAIL BUTTON
    ============================================================ */
-(function initCopyEmail() {
+function initCopyEmail() {
   const btn       = document.getElementById('copyEmailBtn');
   const iconCopy  = btn ? btn.querySelector('.icon-copy')  : null;
   const iconCheck = btn ? btn.querySelector('.icon-check') : null;
@@ -790,7 +1110,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     try {
       await navigator.clipboard.writeText(email);
     } catch {
-      // Fallback for browsers that block clipboard without HTTPS
       const ta = document.createElement('textarea');
       ta.value = email;
       ta.style.cssText = 'position:fixed;opacity:0;';
@@ -800,12 +1119,10 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
       document.body.removeChild(ta);
     }
 
-    // Swap icons and add copied state
     if (iconCopy)  iconCopy.hidden  = true;
     if (iconCheck) iconCheck.hidden = false;
     btn.classList.add('copied');
 
-    // Toast
     showCopyToast();
 
     setTimeout(() => {
@@ -816,14 +1133,13 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   });
 
   function showCopyToast() {
-    // Reuse admin toast if available, otherwise create a simple one
     const container = document.getElementById('toastContainer');
     const target = container || document.body;
     const el = document.createElement('div');
     el.style.cssText = `
       position:fixed; bottom:24px; right:24px; z-index:9999;
       background:#1a1a1a; border:1px solid #2a2a2a;
-      border-left:3px solid #22c55e;
+      border-left:3px solid #FF3B30;
       color:#F5F5F5; font-family:'Manrope',sans-serif;
       font-size:13px; font-weight:600; letter-spacing:0.04em;
       padding:14px 20px; min-width:220px;
@@ -833,13 +1149,12 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     target.appendChild(el);
     setTimeout(() => el.remove(), 3000);
   }
-})();
-
+}
 
 /* ============================================================
    8. SOUND BUTTON TOGGLE
    ============================================================ */
-(function initSound() {
+function initSound() {
   const soundBtn = $('#soundBtn');
   if (!soundBtn) return;
 
@@ -847,13 +1162,11 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     const isOn = soundBtn.getAttribute('aria-pressed') === 'true';
     soundBtn.setAttribute('aria-pressed', (!isOn).toString());
 
-    // Update real video muted state
     const video = $('.showreel-video');
     if (video) {
       video.muted = isOn;
     }
 
-    // Update label text (keeps icon, replaces text node)
     const textNode = [...soundBtn.childNodes].find(n => n.nodeType === Node.TEXT_NODE);
     if (textNode) {
       textNode.textContent = isOn ? ' SOUND OFF' : ' SOUND ON';
@@ -861,13 +1174,12 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
       soundBtn.lastChild.textContent = isOn ? ' SOUND OFF' : ' SOUND ON';
     }
   });
-})();
-
+}
 
 /* ============================================================
-   9. CONTACT FORM — PREVENT DEFAULT + SHOW CONFIRMATION
+   9. CONTACT FORM
    ============================================================ */
-(function initForm() {
+function initForm() {
   const form       = $('#contactForm');
   const successMsg = $('#formSuccess');
   const submitBtn  = form ? form.querySelector('.btn-contact-submit') : null;
@@ -889,7 +1201,6 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
       message:      form.querySelector('#contact-message')?.value || '',
     };
 
-    // Use real API when FF_API_URL is configured, otherwise save locally
     const apiBase = (window.FF_API_URL || '').replace(/\/$/, '');
 
     const apiCall = apiBase
@@ -901,9 +1212,8 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
       : Promise.resolve();
 
     apiCall
-      .catch(() => {}) // always fall through to local save
+      .catch(() => {}) 
       .then(() => {
-        // Always mirror to localStorage so admin panel sees it
         if (typeof window.FF_saveEnquiry === 'function') {
           window.FF_saveEnquiry(payload);
         } else {
@@ -926,13 +1236,12 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
         setTimeout(() => successMsg.classList.remove('visible'), 5000);
       });
   });
-})();
-
+}
 
 /* ============================================================
-   9. BACK TO TOP BUTTON
+   9b. BACK TO TOP BUTTON
    ============================================================ */
-(function initBackToTop() {
+function initBackToTop() {
   const btn = document.querySelector('[data-testid="back-to-top-btn"]');
   if (!btn) return;
 
@@ -943,13 +1252,12 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   });
-})();
-
+}
 
 /* ============================================================
-   10. ACTIVE NAV LINK — HIGHLIGHT BASED ON SCROLL POSITION
+   10. ACTIVE NAV LINK
    ============================================================ */
-(function initActiveNavLink() {
+function initActiveNavLink() {
   const navLinks = $$('.nav-link');
   const sections = navLinks
     .map((link) => {
@@ -980,4 +1288,29 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   );
 
   sections.forEach((sec) => observer.observe(sec));
-})();
+}
+
+/* ============================================================
+   INIT MASTER CONTROL ON DOM LOAD
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load dynamic data first
+  await initPortfolioData();
+
+  // Initialize Lenis scroll first
+  initLenis();
+
+  // Initialize other visual components
+  initHero();
+  initCursor();
+  initNav();
+  initReveal();
+  initProjectModal();
+  initProcess();
+  initShowreelPlayer();
+  initCopyEmail();
+  initSound();
+  initForm();
+  initBackToTop();
+  initActiveNavLink();
+});

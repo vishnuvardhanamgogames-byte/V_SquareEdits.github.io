@@ -66,10 +66,10 @@
   <!-- ===================== DASHBOARD ===================== -->
   <main class="dashboard" id="dashboard" data-testid="admin-dashboard" hidden>
 
-    <header class="dash-header">
+    <header class="dash-header" style="margin-bottom: 20px; border-bottom: none; padding-bottom: 0;">
       <div>
         <p class="admin-eyebrow">ADMIN</p>
-        <h1 class="admin-heading" id="dashTitle">PROJECT ENQUIRIES</h1>
+        <h1 class="admin-heading" id="dashTitle">DASHBOARD</h1>
       </div>
       <div class="dash-actions">
         <button class="btn-icon" id="refreshBtn" data-testid="admin-refresh-btn" aria-label="Refresh enquiries" title="Refresh">
@@ -91,8 +91,146 @@
       </div>
     </header>
 
-    <div class="enquiry-list" id="enquiryList">
-      <!-- Enquiry cards injected here by JS -->
+    <!-- Tab navigation -->
+    <div class="dash-tabs" style="display: flex; gap: 24px; border-bottom: 1px solid #1e1e1e; margin-bottom: 32px; padding-bottom: 12px;">
+      <button class="dash-tab-btn active" id="tabEnquiriesBtn" style="background: none; border: none; color: #FFF; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.1em; cursor: pointer; padding: 4px 8px; border-bottom: 2px solid var(--color-accent); transition: all 0.2s;">ENQUIRIES</button>
+      <button class="dash-tab-btn" id="tabEditWebsiteBtn" style="background: none; border: none; color: #666; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.1em; cursor: pointer; padding: 4px 8px; border-bottom: 2px solid transparent; transition: all 0.2s;">EDIT WEBSITE</button>
+    </div>
+
+    <!-- Tab 1: Enquiries Inbox -->
+    <div id="enquiriesTabContent">
+      <div class="enquiry-list" id="enquiryList">
+        <!-- Enquiry cards injected here by JS -->
+      </div>
+    </div>
+
+    <!-- Tab 2: Edit Website Form -->
+    <div id="editWebsiteTabContent" style="display: none;">
+      <form id="websiteEditorForm" style="display: flex; flex-direction: column; gap: 40px; max-width: 800px; padding-bottom: 80px;">
+        
+        <!-- General / Navigation -->
+        <div class="editor-section" style="border: 1px solid #1e1e1e; background: #0d0d0d; padding: 32px; display: flex; flex-direction: column; gap: 20px;">
+          <h3 class="admin-eyebrow" style="margin-bottom: 8px;">General &amp; Navigation</h3>
+          
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editLogoText" class="admin-label">Logo / Header Text</label>
+            <input type="text" id="editLogoText" class="admin-input" required placeholder="ALEX MERCER" />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editContactEmail" class="admin-label">Contact Email Address</label>
+            <input type="email" id="editContactEmail" class="admin-input" required placeholder="hello@yourname.com" />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editInstagram" class="admin-label">Instagram Link</label>
+            <input type="url" id="editInstagram" class="admin-input" placeholder="https://instagram.com/handle" />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editYouTube" class="admin-label">YouTube Link</label>
+            <input type="url" id="editYouTube" class="admin-input" placeholder="https://youtube.com/@handle" />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editLinkedIn" class="admin-label">LinkedIn Link</label>
+            <input type="url" id="editLinkedIn" class="admin-input" placeholder="https://linkedin.com/in/handle" />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editVimeo" class="admin-label">Vimeo Link</label>
+            <input type="url" id="editVimeo" class="admin-input" placeholder="https://vimeo.com/handle" />
+          </div>
+        </div>
+
+        <!-- Hero Settings -->
+        <div class="editor-section" style="border: 1px solid #1e1e1e; background: #0d0d0d; padding: 32px; display: flex; flex-direction: column; gap: 20px;">
+          <h3 class="admin-eyebrow" style="margin-bottom: 8px;">Hero Section</h3>
+          
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editHeroEyebrow" class="admin-label">Hero Eyebrow (Job Title / Intro)</label>
+            <input type="text" id="editHeroEyebrow" class="admin-input" required placeholder="VIDEO EDITOR — MOTION • STORY • IMPACT" />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editHeroHeadline" class="admin-label">Headline (Separate lines with commas)</label>
+            <input type="text" id="editHeroHeadline" class="admin-input" required placeholder="CUTTING, STORIES INTO, MOTION." />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editHeroSubtext" class="admin-label">Hero Description / Subtext</label>
+            <textarea id="editHeroSubtext" class="admin-input" style="border: 1px solid var(--color-border2); padding: 8px; background: transparent; min-height: 80px;" required></textarea>
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editHeroShowreel" class="admin-label">Showreel Video Link (Direct MP4 or stream URL)</label>
+            <input type="url" id="editHeroShowreel" class="admin-input" required placeholder="https://..." />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editShowreelDuration" class="admin-label">Showreel Duration</label>
+            <input type="text" id="editShowreelDuration" class="admin-input" required placeholder="01:00" />
+          </div>
+        </div>
+
+        <!-- About Settings -->
+        <div class="editor-section" style="border: 1px solid #1e1e1e; background: #0d0d0d; padding: 32px; display: flex; flex-direction: column; gap: 20px;">
+          <h3 class="admin-eyebrow" style="margin-bottom: 8px;">About Section</h3>
+          
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editAboutHeading" class="admin-label">About Heading (Separate lines with commas)</label>
+            <input type="text" id="editAboutHeading" class="admin-input" required placeholder="BEHIND, THE EDIT" />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editPortraitCaption" class="admin-label">Portrait Image Caption</label>
+            <input type="text" id="editPortraitCaption" class="admin-input" required placeholder="ALEX MERCER — VIDEO EDITOR" />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editBioParagraph1" class="admin-label">Bio Paragraph 1</label>
+            <textarea id="editBioParagraph1" class="admin-input" style="border: 1px solid var(--color-border2); padding: 8px; background: transparent; min-height: 100px;" required></textarea>
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editBioParagraph2" class="admin-label">Bio Paragraph 2</label>
+            <textarea id="editBioParagraph2" class="admin-input" style="border: 1px solid var(--color-border2); padding: 8px; background: transparent; min-height: 100px;" required></textarea>
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editAboutLocation" class="admin-label">Location (City, Country)</label>
+            <input type="text" id="editAboutLocation" class="admin-input" required placeholder="Your City, Country" />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editAboutExperience" class="admin-label">Experience Stat (e.g. 4+ Years)</label>
+            <input type="text" id="editAboutExperience" class="admin-input" required placeholder="4+ Years" />
+          </div>
+          <div class="form-field" style="margin-top: 0;">
+            <label for="editAboutSpecialties" class="admin-label">Specialties Stat</label>
+            <input type="text" id="editAboutSpecialties" class="admin-input" required placeholder="Cinematic Edits / Motion Graphics / Color" />
+          </div>
+        </div>
+
+        <!-- Projects List Settings -->
+        <div class="editor-section" style="border: 1px solid #1e1e1e; background: #0d0d0d; padding: 32px; display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e1e1e; padding-bottom: 12px; margin-bottom: 8px;">
+            <h3 class="admin-eyebrow" style="margin-bottom: 0;">Projects List</h3>
+            <button type="button" id="addNewProjectBtn" style="background: none; border: 1px solid var(--color-accent); color: var(--color-accent); font-size: 10px; font-weight: 700; padding: 6px 12px; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s;">+ ADD NEW PROJECT</button>
+          </div>
+          
+          <div id="projectsEditorList" style="display: flex; flex-direction: column; gap: 32px;">
+            <!-- Dynamic project editors injected here -->
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="editor-actions-bar" style="display: flex; gap: 16px; border-top: 1px solid #1e1e1e; padding-top: 24px; margin-top: 12px; flex-wrap: wrap;">
+          <button type="submit" class="btn-admin-primary" style="margin-top: 0; width: auto; padding: 14px 28px;">SAVE PREVIEW</button>
+          
+          <button type="button" id="exportDataJsonBtn" class="btn-icon-text" style="height: 48px; border: 1px solid #2a2a2a; color: #FFF; background: #111; padding: 0 24px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            DOWNLOAD DATA.JSON
+          </button>
+        </div>
+
+        <div style="background: rgba(255, 59, 48, 0.05); border: 1px solid rgba(255, 59, 48, 0.2); border-left: 3px solid var(--color-accent); padding: 16px; font-size: 12px; color: var(--color-muted);">
+          <span style="font-weight: 700; color: #FFF; display: block; margin-bottom: 4px;">ℹ️ HOW TO UPDATE YOUR LIVE WEBSITE:</span>
+          1. Edit the fields above and click <strong>SAVE PREVIEW</strong> to test the changes instantly in your browser.<br>
+          2. Once you are satisfied, click <strong>DOWNLOAD DATA.JSON</strong>.<br>
+          3. Save the downloaded file into your local project folder (replacing the old <code>data.json</code>).<br>
+          4. Open your terminal, run <code>git add .</code>, <code>git commit -m "Update website content"</code>, and <code>git push</code>. Your live website on GitHub Pages will update within a minute!
+        </div>
+
+      </form>
     </div>
 
   </main>
