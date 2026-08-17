@@ -918,6 +918,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // ── Reset to Server Database ─────────────────────────────
+  $('resetToDefaultBtn').addEventListener('click', async () => {
+    if (confirm('Are you sure you want to discard your local preview and reset all details from your GitHub database?')) {
+      try {
+        const res = await fetch(`data.json?v=${Date.now()}`);
+        if (res.ok) {
+          const freshData = await res.json();
+          localStorage.setItem('portfolio_data', JSON.stringify(freshData));
+          portfolioData = freshData;
+          populateEditorForm();
+          toast('Successfully reset and synced all details from GitHub!');
+        } else {
+          throw new Error('Failed to retrieve data.json from server.');
+        }
+      } catch (err) {
+        console.error(err);
+        toast('Failed to sync details from GitHub.', 'error');
+      }
+    }
+  });
+
   // ── Save Form Submit ───────────────────────────────────────
   $('websiteEditorForm').addEventListener('submit', (e) => {
     e.preventDefault();
