@@ -451,6 +451,9 @@ async function loadCMSData() {
 function populateEditorForm() {
   if (!portfolioData) return;
 
+  // GitHub token
+  $('editGithubToken').value = localStorage.getItem('ff_gh_token') || '';
+
   // General & Nav
   $('editLogoText').value = portfolioData.nav ? portfolioData.nav.logoText : '';
   $('editContactEmail').value = portfolioData.contact ? portfolioData.contact.email : '';
@@ -568,12 +571,16 @@ function renderProjectEditors(projects) {
   });
 }
 
-function saveLocalPreview() {
+async function saveLocalPreview() {
   const form = $('websiteEditorForm');
   if (!form.checkValidity()) {
     form.reportValidity();
     return;
   }
+
+  // Save token to localstorage
+  const ghToken = $('editGithubToken').value.trim();
+  localStorage.setItem('ff_gh_token', ghToken);
 
   // Construct new portfolio data object
   const updatedData = {
@@ -616,9 +623,86 @@ function saveLocalPreview() {
   try {
     localStorage.setItem('portfolio_data', JSON.stringify(updatedData));
     portfolioData = updatedData;
-    toast('Preview updated successfully! Refresh your home page to see it.');
+    toast('Preview updated locally!');
   } catch (e) {
     toast('Failed to save preview locally.', 'error');
+  }
+
+  // Trigger GitHub commit if token is configured
+  if (ghToken) {
+    await publishToGithub(updatedData, ghToken);
+  } else {
+    toast('Preview saved! Paste a GitHub Token in General Settings to publish live automatically.', 'error');
+  }
+}
+
+async function publishToGithub(updatedData, token) {
+  const publishBtn = $('saveAndPublishBtn');
+  const originalText = publishBtn.textContent;
+  const statusAlert = $('publishStatusAlert');
+  
+  publishBtn.textContent = 'PUBLISHING TO GITHUB...';
+  publishBtn.disabled = true;
+  statusAlert.style.display = 'none';
+
+  try {
+    const owner = 'vishnuvardhanamgogames-byte';
+    const repo = 'V_SquareEdits.github.io';
+    const path = 'data.json';
+
+    // 1. Get the current file details to retrieve the SHA
+    const getUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+    const getRes = await fetch(getUrl, {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    if (!getRes.ok) {
+      throw new Error(`Failed to contact GitHub (${getRes.status}). Please check your token or token permissions.`);
+    }
+
+    const fileData = await getRes.json();
+    const sha = fileData.sha;
+
+    // 2. Put the new JSON content
+    const putUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+    // Safe Base64 encoding supporting unicode characters
+    const jsonString = JSON.stringify(updatedData, null, 2);
+    const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
+    
+    const putRes = await fetch(putUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: 'Update portfolio configuration via Admin CMS',
+        content: contentBase64,
+        sha: sha,
+        branch: 'main'
+      })
+    });
+
+    if (!putRes.ok) {
+      const errBody = await putRes.json().catch(() => ({}));
+      throw new Error(errBody.message || `Failed to write file on GitHub (${putRes.status}).`);
+    }
+
+    // Success!
+    toast('Published live to GitHub!');
+    statusAlert.style.display = 'block';
+    statusAlert.scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    console.error(err);
+    toast(err.message || 'Failed to publish to GitHub.', 'error');
+  } finally {
+    publishBtn.textContent = originalText;
+    publishBtn.disabled = false;
   }
 }
 
@@ -839,9 +923,6 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     saveLocalPreview();
   });
-
-  // ── Export JSON ────────────────────────────────────────────
-  $('exportDataJsonBtn').addEventListener('click', exportConfigJson);
 
   // ── Init ───────────────────────────────────────────────────
   if (token) {
