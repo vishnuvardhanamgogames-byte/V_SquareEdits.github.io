@@ -11,6 +11,7 @@ const USE_LOCAL = !API_BASE; // fallback to localStorage when no API configured
 
 /* ── Utility ─────────────────────────────────────────────────── */
 const $ = (id) => document.getElementById(id);
+const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
 function toast(message, type = 'success') {
   const container = $('toastContainer');
