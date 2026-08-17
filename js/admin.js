@@ -462,12 +462,14 @@ function populateEditorForm() {
   $('editHeroEyebrow').value = portfolioData.hero ? portfolioData.hero.eyebrow : '';
   $('editHeroHeadline').value = portfolioData.hero ? portfolioData.hero.headlineLines.join(', ') : '';
   $('editHeroSubtext').value = portfolioData.hero ? portfolioData.hero.subtext : '';
+  $('editHeroBgImage').value = portfolioData.hero ? (portfolioData.hero.showreelPoster || '') : '';
   $('editHeroShowreel').value = portfolioData.hero ? portfolioData.hero.showreelVideo : '';
   $('editShowreelDuration').value = portfolioData.hero ? portfolioData.hero.showreelDuration : '01:00';
 
   // About
   $('editAboutHeading').value = portfolioData.about ? portfolioData.about.headingLines.join(', ') : '';
   $('editPortraitCaption').value = portfolioData.about ? portfolioData.about.portraitCaption : '';
+  $('editAboutPortraitImage').value = portfolioData.about ? (portfolioData.about.portraitImage || '') : '';
   $('editBioParagraph1').value = portfolioData.about ? portfolioData.about.bioParagraph1 : '';
   $('editBioParagraph2').value = portfolioData.about ? portfolioData.about.bioParagraph2 : '';
   $('editAboutLocation').value = portfolioData.about ? portfolioData.about.location : '';
@@ -582,14 +584,14 @@ function saveLocalPreview() {
       headlineLines: $('editHeroHeadline').value.split(',').map(s => s.trim()).filter(Boolean),
       subtext: $('editHeroSubtext').value.trim(),
       showreelVideo: $('editHeroShowreel').value.trim(),
-      showreelPoster: portfolioData.hero ? portfolioData.hero.showreelPoster : "public/images/projects/hero_workspace.jpg",
+      showreelPoster: $('editHeroBgImage').value.trim() || (portfolioData.hero ? portfolioData.hero.showreelPoster : "public/images/projects/hero_workspace.jpg"),
       showreelDuration: $('editShowreelDuration').value.trim()
     },
     marquee: portfolioData.marquee || ["EDIT", "DESIGN", "STORYTELL", "COLOR", "SOUND", "MOTION"],
     about: {
       headingLines: $('editAboutHeading').value.split(',').map(s => s.trim()).filter(Boolean),
       portraitCaption: $('editPortraitCaption').value.trim(),
-      portraitImage: portfolioData.about ? portfolioData.about.portraitImage : "public/images/profile/profile.jpg",
+      portraitImage: $('editAboutPortraitImage').value.trim() || (portfolioData.about ? portfolioData.about.portraitImage : "public/images/profile/profile.jpg"),
       bioParagraph1: $('editBioParagraph1').value.trim(),
       bioParagraph2: $('editBioParagraph2').value.trim(),
       location: $('editAboutLocation').value.trim(),
