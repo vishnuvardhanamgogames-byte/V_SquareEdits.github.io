@@ -827,6 +827,19 @@ function initProjectModal() {
     descCol.textContent = data.desc;
   }
 
+function getEmbedUrl(url) {
+  if (!url) return '';
+  const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+  if (ytMatch && ytMatch[1]) {
+    return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`;
+  }
+  const vimeoMatch = url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/i);
+  if (vimeoMatch && vimeoMatch[1]) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+  }
+  return '';
+}
+
   function openModal(idx) {
     const projects = window.portfolioData.projects;
     const p = projects[idx];
@@ -843,7 +856,24 @@ function initProjectModal() {
     $('#modalSoftware').textContent    = p.software;
     $('#modalYear').textContent        = p.year;
 
-    if (modalVideo) {
+    const embedVideo = $('#modalEmbedVideo');
+    if (modalVideo && embedVideo) {
+      const embedUrl = getEmbedUrl(p.video);
+      if (embedUrl) {
+        modalVideo.style.display = 'none';
+        modalVideo.src = '';
+        
+        embedVideo.style.display = 'block';
+        embedVideo.src = embedUrl;
+      } else {
+        embedVideo.style.display = 'none';
+        embedVideo.src = '';
+        
+        modalVideo.style.display = 'block';
+        modalVideo.src = p.video;
+        modalVideo.load();
+      }
+    } else if (modalVideo) {
       modalVideo.src = p.video;
       modalVideo.load();
     }
@@ -872,6 +902,11 @@ function initProjectModal() {
     if (modalVideo) {
       modalVideo.pause();
       modalVideo.src = '';
+    }
+
+    const embedVideo = $('#modalEmbedVideo');
+    if (embedVideo) {
+      embedVideo.src = '';
     }
 
     setTimeout(() => {

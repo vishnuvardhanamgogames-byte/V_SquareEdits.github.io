@@ -391,8 +391,9 @@
           </div>
 
           <!-- Video player (Final Cut) -->
-          <div class="modal-video-wrapper">
+          <div class="modal-video-wrapper" style="position: relative;">
             <video class="modal-video" id="modalVideo" controls playsinline preload="metadata"></video>
+            <iframe id="modalEmbedVideo" class="modal-video" style="border: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
           </div>
 
           <!-- Project Meta -->
