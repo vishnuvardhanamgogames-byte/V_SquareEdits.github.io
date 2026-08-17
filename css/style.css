@@ -2456,8 +2456,10 @@ html.custom-cursor-on * {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 28px;
-  width: 100%;
+  justify-content: center;
+  margin: 0 auto 28px auto;
+  width: fit-content;
+  align-self: center;
 }
 
 .hero-avatar-wrapper {
@@ -2483,8 +2485,13 @@ html.custom-cursor-on * {
   object-fit: cover;
   display: block;
   background: #000;
-  will-change: transform;
-  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform, filter;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), filter 0.5s ease-in-out;
+  filter: grayscale(100%) brightness(0.65);
+}
+
+.hero-avatar-img.colorful {
+  filter: grayscale(0%) brightness(1);
 }
 
 /* Hover Scale Interaction */

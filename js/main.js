@@ -1342,6 +1342,11 @@ function initProfileParallax() {
   const img = document.getElementById('heroAvatarImg');
   if (!wrapper || !img) return;
 
+  // Tap/click toggles colorful/grayscale modes (supports touch & cursor devices)
+  wrapper.addEventListener('click', () => {
+    img.classList.toggle('colorful');
+  });
+
   const finePointer = window.matchMedia('(pointer: fine)').matches;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!finePointer || reducedMotion) return;
