@@ -1,0 +1,365 @@
+/* ============================================================
+   FRAMEFLOW — ADMIN PANEL
+   admin.css
+   ============================================================ */
+
+:root {
+  --color-bg:        #080808;
+  --color-surface:   #0d0d0d;
+  --color-surface2:  #0b0b0b;
+  --color-border:    #1e1e1e;
+  --color-border2:   #2a2a2a;
+  --color-text:      #F5F5F5;
+  --color-muted:     #A0A0A0;
+  --color-faint:     #666;
+  --color-accent:    #FF3B30;
+  --font-main:       'Manrope', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-main);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font-main); cursor: pointer; }
+
+/* ── Shared typography ──────────────────────────────────────── */
+.admin-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+
+.admin-heading {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin-top: 6px;
+}
+
+.admin-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--color-faint);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.admin-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border2);
+  color: var(--color-text);
+  font-family: var(--font-main);
+  font-size: 14px;
+  padding: 12px 0;
+  outline: none;
+  transition: border-color 0.25s;
+}
+
+.admin-input:focus {
+  border-color: var(--color-accent);
+}
+
+.admin-input::placeholder { color: rgba(245,245,245,0.2); }
+
+/* ── LOGIN PAGE ─────────────────────────────────────────────── */
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #222;
+  background: var(--color-surface);
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin-top: 24px;
+}
+
+.mt-8 { margin-top: 36px; }
+
+.login-error {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-accent);
+  min-height: 20px;
+  margin-top: 16px;
+  letter-spacing: 0.02em;
+}
+
+.btn-admin-primary {
+  margin-top: 32px;
+  width: 100%;
+  border: 1px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  padding: 14px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.btn-admin-primary:hover {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.btn-admin-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-back-link {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--color-faint);
+  transition: color 0.2s;
+}
+
+.admin-back-link:hover { color: var(--color-text); }
+
+/* ── DASHBOARD ──────────────────────────────────────────────── */
+.dashboard {
+  min-height: 100vh;
+  padding: clamp(32px, 5vw, 48px) clamp(20px, 5vw, 64px);
+}
+
+.dash-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 24px;
+  margin-bottom: 40px;
+}
+
+.dash-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Icon-only square button */
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-border2);
+  background: transparent;
+  color: var(--color-muted);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-icon:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+/* Icon + text button */
+.btn-icon-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--color-border2);
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-icon-text:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+/* New badge count in heading */
+.new-badge {
+  color: var(--color-accent);
+}
+
+/* ── ENQUIRY LIST ───────────────────────────────────────────── */
+.enquiry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empty-state {
+  font-size: 14px;
+  color: var(--color-faint);
+  padding: 40px 0;
+}
+
+.loading-state {
+  font-size: 14px;
+  color: var(--color-faint);
+}
+
+/* ── ENQUIRY CARD ───────────────────────────────────────────── */
+.enquiry-card {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface2);
+  padding: 24px;
+  transition: border-color 0.2s;
+}
+
+.enquiry-card.unread {
+  border-color: rgba(255, 59, 48, 0.35);
+  background: var(--color-surface);
+}
+
+.card-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.card-meta-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  flex-wrap: wrap;
+}
+
+.unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.card-email {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-faint);
+}
+
+.card-sub {
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--color-faint);
+  text-transform: uppercase;
+}
+
+.card-body {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-muted);
+  max-width: 760px;
+}
+
+.card-btns {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Small action buttons on each card */
+.btn-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-border2);
+  background: transparent;
+  color: var(--color-muted);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-card:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.btn-card.delete:hover {
+  color: var(--color-accent);
+}
+
+/* ── TOAST ──────────────────────────────────────────────────── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  background: #1a1a1a;
+  border: 1px solid var(--color-border2);
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 14px 20px;
+  min-width: 240px;
+  pointer-events: auto;
+  animation: toastIn 0.3s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+.toast.success { border-left: 3px solid #22c55e; }
+.toast.error   { border-left: 3px solid var(--color-accent); }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 540px) {
+  .login-form { padding: 32px 24px; }
+  .card-top   { flex-direction: column; }
+  .card-btns  { align-self: flex-end; }
+}

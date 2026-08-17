@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080808" />
+  <meta name="description" content="Alex Mercer — Video Editor & Motion Designer. Cinematic editing, motion graphics, visual effects, color grading and sound design." />
+  <title>ALEX MERCER — Video Editor & Motion Designer</title>
+
+  <!-- Favicon: drop your file into public/icons/ and uncomment -->
+  <!-- <link rel="icon" href="public/icons/favicon.svg" /> -->
+  <!-- <link rel="apple-touch-icon" href="public/icons/apple-touch-icon.png" /> -->
+
+  <!-- Google Fonts: Bebas Neue (headings) + Manrope (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body style="background:#080808">
+
+  <!-- Custom Cursor: single 8px circle, mix-blend-difference -->
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+
+  <!-- Grain Overlay -->
+  <div class="grain-overlay" aria-hidden="true"></div>
+
+  <!-- ===================== NAV ===================== -->
+  <nav class="nav" id="nav" role="navigation" aria-label="Main navigation" data-testid="navbar">
+    <a href="#top" class="nav-logo" data-testid="nav-logo">ALEX MERCER<span style="color: var(--color-accent);">.</span></a>
+    <ul class="nav-links" role="list">
+      <li><a href="#work" class="nav-link" data-testid="nav-link-work">WORK</a></li>
+      <li><a href="#about" class="nav-link" data-testid="nav-link-about">ABOUT</a></li>
+      <li><a href="#services" class="nav-link" data-testid="nav-link-services">SERVICES</a></li>
+      <li><a href="#contact" class="nav-link" data-testid="nav-link-contact">CONTACT</a></li>
+    </ul>
+    <!-- Mobile hamburger -->
+    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false" data-testid="nav-menu-button">
+      <span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Nav Drawer -->
+  <div class="nav-drawer" id="navDrawer" aria-hidden="true" data-testid="mobile-menu">
+    <ul role="list">
+      <li><a href="#work" class="drawer-link" data-testid="mobile-nav-work">WORK</a></li>
+      <li><a href="#about" class="drawer-link" data-testid="mobile-nav-about">ABOUT</a></li>
+      <li><a href="#services" class="drawer-link" data-testid="mobile-nav-services">SERVICES</a></li>
+      <li><a href="#contact" class="drawer-link" data-testid="mobile-nav-contact">CONTACT</a></li>
+    </ul>
+  </div>
+
+  <main>
+
+    <!-- ===================== HERO ===================== -->
+    <section class="hero" id="top" aria-label="Hero" data-testid="hero-section">
+
+      <!-- Parallax background (image + gradient overlay) -->
+      <div class="hero-bg" aria-hidden="true" id="heroBg">
+        <img
+          src="https://images.unsplash.com/photo-1758553026412-bc1da0ebd366?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzN8MHwxfHNlYXJjaHwxfHxjaW5lbWF0aWMlMjB2aWRlbyUyMGVkaXRpbmclMjB3b3Jrc3BhY2V8ZW58MHx8fHwxNzg2NjEzNjc4fDA&ixlib=rb-4.1.0&q=85"
+          alt=""
+          class="hero-bg-img"
+        />
+        <div class="hero-bg-gradient"></div>
+      </div>
+
+      <!-- Hero content (fades out on scroll) -->
+      <div class="hero-content" id="heroContent">
+
+        <p class="hero-eyebrow fade-in" style="--delay:0.15s">
+          <span class="hero-eyebrow-dot" aria-hidden="true"></span>
+          VIDEO EDITOR — MOTION • STORY • IMPACT
+        </p>
+
+        <h1 class="hero-headline" aria-label="Cutting stories into motion">
+          <span class="hero-line"><span class="hero-line-inner" style="--delay:0.25s">CUTTING</span></span>
+          <span class="hero-line"><span class="hero-line-inner" style="--delay:0.38s">STORIES INTO</span></span>
+          <span class="hero-line accent-line"><span class="hero-line-inner" style="--delay:0.51s">MOTION.</span></span>
+        </h1>
+
+        <div class="hero-bottom">
+          <p class="hero-sub fade-in" data-testid="hero-subtext" style="--delay:0.85s">
+            Video Editor &amp; Motion Designer specializing in cinematic edits, social content, motion graphics and visual storytelling.
+          </p>
+
+          <button class="btn-showreel fade-in" id="showreelBtn" data-testid="play-showreel-btn" data-cursor="PLAY" style="--delay:1s" aria-label="Play showreel">
+            <span class="play-circle" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 3L19 12L5 21V3Z"/>
+              </svg>
+            </span>
+            <span class="btn-showreel-text">
+              <span class="btn-showreel-label">PLAY SHOWREEL</span>
+              <span class="btn-showreel-duration">01:00</span>
+            </span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Scroll indicator (bottom left) -->
+      <div class="hero-scroll fade-in" style="--delay:1.4s" aria-hidden="true">
+        <svg class="hero-scroll-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF3B30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+        </svg>
+        <span class="hero-scroll-text">SCROLL TO EXPLORE</span>
+      </div>
+
+    </section>
+
+    <!-- ===================== SHOWREEL / WORK ===================== -->
+    <section class="showreel section-pad" id="work" aria-label="Showreel" data-testid="showreel-section">
+      <div class="showreel-header reveal">
+        <h2 class="showreel-title">THE SHOWREEL</h2>
+        <span class="showreel-sound-tag">SOUND ON</span>
+      </div>
+
+      <div class="video-wrapper reveal" id="videoWrapper">
+        <!-- Custom video player matching ShowreelPlayer.jsx -->
+        <div class="video-player-wrap" id="videoWrap" data-cursor="PLAY" data-testid="showreel-player">
+
+          <video
+            id="showreelVideo"
+            class="showreel-video"
+            src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+            poster="public/images/projects/hero_workspace.jpg"
+            playsinline
+            preload="metadata"
+          ></video>
+
+          <!-- Big play overlay -->
+          <button
+            class="video-big-play"
+            id="videoBigPlay"
+            data-testid="showreel-player-big-play"
+            aria-label="Play video"
+          >
+            <span class="video-big-play-circle">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M5 3L19 12L5 21V3Z"/>
+              </svg>
+            </span>
+          </button>
+
+          <!-- Error state -->
+          <div class="video-error-state" id="videoError" hidden>
+            <span class="video-error-dot" aria-hidden="true"></span>
+            <p class="video-error-title">YOUR VIDEO GOES HERE</p>
+            <p class="video-error-sub">
+              Drop your file into <code>public/videos/</code> and update the path in
+              <code>public/HOW_TO_REPLACE_MEDIA.md</code>
+            </p>
+          </div>
+
+          <!-- Label (top-left) -->
+          <div class="video-label-overlay" id="videoLabel" aria-hidden="true">
+            <span class="video-label-dot" id="videoLabelDot" hidden></span>
+            <span class="video-label-text">SHOWREEL — 2026</span>
+          </div>
+
+          <!-- Controls bar (hidden until hover/focus on desktop) -->
+          <div class="video-controls-bar" id="videoControlsBar">
+
+            <!-- Progress bar -->
+            <div
+              class="video-progress-wrap"
+              id="videoProgress"
+              role="slider"
+              aria-label="Seek"
+              aria-valuenow="0"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              tabindex="0"
+              data-testid="showreel-player-progress"
+            >
+              <div class="video-progress-track">
+                <div class="video-progress-fill" id="videoProgressFill">
+                  <span class="video-progress-thumb" id="videoThumb"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom row -->
+            <div class="video-controls-row">
+              <button class="video-ctrl-btn" id="videoToggleBtn" data-testid="showreel-player-toggle" aria-label="Play">
+                <!-- Play icon -->
+                <svg class="icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 3L19 12L5 21V3Z"/></svg>
+                <!-- Pause icon -->
+                <svg class="icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" hidden><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              </button>
+
+              <span class="video-time-display" id="videoTime" data-testid="showreel-player-time">00:00 <span class="video-time-total">/ 00:00</span></span>
+
+              <div class="video-ctrl-spacer"></div>
+
+              <button class="video-ctrl-btn" id="videoMuteBtn" data-testid="showreel-player-mute" aria-label="Mute">
+                <!-- Volume on -->
+                <svg class="icon-vol-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                <!-- Volume off -->
+                <svg class="icon-vol-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" hidden><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+              </button>
+
+              <button class="video-ctrl-btn" id="videoFullscreenBtn" data-testid="showreel-player-fullscreen" aria-label="Fullscreen">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== MARQUEE ===================== -->
+    <div class="marquee-section" aria-hidden="true" data-testid="marquee">
+      <div class="marquee-track">
+        <!-- Copy 1 -->
+        <span class="marquee-item"><span class="marquee-word">EDIT</span><span class="marquee-sep">•</span></span>
+        <span class="marquee-item"><span class="marquee-word marquee-outline">DESIGN</span><span class="marquee-sep">•</span></span>
+        <span class="marquee-item"><span class="marquee-word">STORYTELL</span><span class="marquee-sep">•</span></span>
+        <span class="marquee-item"><span class="marquee-word marquee-outline">COLOR</span><span class="marquee-sep">•</span></span>
+        <span class="marquee-item"><span class="marquee-word">SOUND</span><span class="marquee-sep">•</span></span>
+        <span class="marquee-item"><span class="marquee-word marquee-outline">MOTION</span><span class="marquee-sep">•</span></span>
+        <!-- Copy 2 (seamless loop) -->
+        <span class="marquee-item"><span class="marquee-word">EDIT</span><span class="marquee-sep">•</span></span>
+        <span class="marquee-item"><span class="marquee-word marquee-outline">DESIGN</span><span class="marquee-sep">•</span></span>
+        <span class="marquee-item"><span class="marquee-word">STORYTELL</span><span class="marquee-sep">•</span></span>
+        <span class="marquee-item"><span class="marquee-word marquee-outline">COLOR</span><span class="marquee-sep">•</span></span>
+        <span class="marquee-item"><span class="marquee-word">SOUND</span><span class="marquee-sep">•</span></span>
+        <span class="marquee-item"><span class="marquee-word marquee-outline">MOTION</span><span class="marquee-sep">•</span></span>
+      </div>
+    </div>
+
+    <!-- ===================== SELECTED WORK (vertical list) ===================== -->
+    <section class="selected-work section-pad" id="selected-work" aria-label="Selected Work">
+
+      <div class="projects-list">
+
+        <!-- Row 01 -->
+        <button
+          class="project-row reveal"
+          data-testid="project-card-cinematic-trailer"
+          data-cursor="VIEW"
+          data-project="0"
+          aria-label="View project: Cinematic Trailer Edit"
+        >
+          <span class="project-row-index">01</span>
+
+          <div class="project-row-image-wrap">
+            <div class="project-row-image-inner">
+              <img
+                src="https://images.unsplash.com/photo-1771038396898-50c5bbbbfa67?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHw0fHxzcG9ydHMlMjBjYXIlMjBjb21tZXJjaWFsJTIwY2luZW1hdGljfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85"
+                alt="Cinematic Trailer Edit"
+                loading="lazy"
+                class="project-row-img"
+              />
+            </div>
+            <span class="project-row-redline" aria-hidden="true"></span>
+          </div>
+
+          <div class="project-row-info">
+            <h3 class="project-row-title">Cinematic Trailer Edit</h3>
+            <p class="project-row-category">Editing / Color Grading / Sound Design</p>
+          </div>
+
+          <div class="project-row-meta">
+            <span class="project-row-year">2026</span>
+            <svg class="project-row-arrow" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+            </svg>
+          </div>
+        </button>
+
+        <!-- Row 02 -->
+        <button
+          class="project-row reveal"
+          style="--reveal-delay:0.05s"
+          data-testid="project-card-multifandom-edit"
+          data-cursor="VIEW"
+          data-project="1"
+          aria-label="View project: Multifandom Cinematic Edit"
+        >
+          <span class="project-row-index">02</span>
+          <div class="project-row-image-wrap">
+            <div class="project-row-image-inner">
+              <img
+                src="https://images.unsplash.com/photo-1695192721582-5660bca08424?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MDV8MHwxfHNlYXJjaHwyfHxtdXNpYyUyMHZpZGVvJTIwYWVzdGhldGljfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85"
+                alt="Multifandom Cinematic Edit"
+                loading="lazy"
+                class="project-row-img"
+              />
+            </div>
+            <span class="project-row-redline" aria-hidden="true"></span>
+          </div>
+          <div class="project-row-info">
+            <h3 class="project-row-title">Multifandom Cinematic Edit</h3>
+            <p class="project-row-category">Music Editing / Transitions / VFX</p>
+          </div>
+          <div class="project-row-meta">
+            <span class="project-row-year">2026</span>
+            <svg class="project-row-arrow" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+            </svg>
+          </div>
+        </button>
+
+        <!-- Row 03 -->
+        <button
+          class="project-row reveal"
+          style="--reveal-delay:0.1s"
+          data-testid="project-card-motion-graphics-ad"
+          data-cursor="VIEW"
+          data-project="2"
+          aria-label="View project: Motion Graphics Advertisement"
+        >
+          <span class="project-row-index">03</span>
+          <div class="project-row-image-wrap">
+            <div class="project-row-image-inner">
+              <img
+                src="https://images.unsplash.com/photo-1532170579297-281918c8ae72?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2OTV8MHwxfHNlYXJjaHw0fHxjaW5lbWF0aWMlMjBwb3J0cmFpdCUyMGRhcmslMjBtb29kfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85"
+                alt="Motion Graphics Advertisement"
+                loading="lazy"
+                class="project-row-img"
+              />
+            </div>
+            <span class="project-row-redline" aria-hidden="true"></span>
+          </div>
+          <div class="project-row-info">
+            <h3 class="project-row-title">Motion Graphics Advertisement</h3>
+            <p class="project-row-category">Editing / Motion Graphics / After Effects</p>
+          </div>
+          <div class="project-row-meta">
+            <span class="project-row-year">2025</span>
+            <svg class="project-row-arrow" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+            </svg>
+          </div>
+        </button>
+
+        <!-- Row 04 -->
+        <button
+          class="project-row reveal"
+          style="--reveal-delay:0.15s"
+          data-testid="project-card-social-campaign"
+          data-cursor="VIEW"
+          data-project="3"
+          aria-label="View project: Social Media Campaign"
+        >
+          <span class="project-row-index">04</span>
+          <div class="project-row-image-wrap">
+            <div class="project-row-image-inner">
+              <img
+                src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTV8MHwxfHNlYXJjaHwxfHxjb21tZXJjaWFsJTIwZmlsbSUyMGNvbG9yJTIwZ3JhZGluZ3xlbnwwfHx8fDE3ODY2MTM2Nzh8MA&ixlib=rb-4.1.0&q=85"
+                alt="Social Media Campaign"
+                loading="lazy"
+                class="project-row-img"
+              />
+            </div>
+            <span class="project-row-redline" aria-hidden="true"></span>
+          </div>
+          <div class="project-row-info">
+            <h3 class="project-row-title">Social Media Campaign</h3>
+            <p class="project-row-category">Short-form Editing / Typography / Sound Design</p>
+          </div>
+          <div class="project-row-meta">
+            <span class="project-row-year">2025</span>
+            <svg class="project-row-arrow" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+            </svg>
+          </div>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- ===================== PROJECT MODAL ===================== -->
+    <div class="project-modal" id="projectModal" role="dialog" aria-modal="true" aria-label="Project details" hidden>
+      <div class="modal-scroll-wrap">
+        <div class="modal-container">
+          
+          <!-- Header (Title & Close) -->
+          <div class="modal-header">
+            <div>
+              <span class="modal-tag" id="modalIndexTag">PROJECT 01</span>
+              <h3 class="modal-heading-title" id="modalTitle">Project Title</h3>
+            </div>
+            <button class="modal-close-btn" id="modalClose" aria-label="Close project">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+
+          <!-- Video player (Final Cut) -->
+          <div class="modal-video-wrapper">
+            <video class="modal-video" id="modalVideo" controls playsinline preload="metadata"></video>
+          </div>
+
+          <!-- Project Meta -->
+          <div class="modal-meta-grid">
+            <div class="modal-meta-col">
+              <span class="modal-meta-title">CATEGORY</span>
+              <span class="modal-meta-value" id="modalCategory">Category</span>
+            </div>
+            <div class="modal-meta-col">
+              <span class="modal-meta-title">ROLE</span>
+              <span class="modal-meta-value" id="modalRole">Role</span>
+            </div>
+            <div class="modal-meta-col">
+              <span class="modal-meta-title">SOFTWARE</span>
+              <span class="modal-meta-value" id="modalSoftware">Software</span>
+            </div>
+            <div class="modal-meta-col">
+              <span class="modal-meta-title">YEAR</span>
+              <span class="modal-meta-value" id="modalYear">Year</span>
+            </div>
+          </div>
+
+          <!-- Project Description -->
+          <div class="modal-about-grid">
+            <div class="modal-about-label-col">
+              <span class="modal-section-tag">ABOUT THE PROJECT</span>
+            </div>
+            <div class="modal-about-desc-col">
+              <p class="modal-about-text" id="modalDescription">Description text</p>
+            </div>
+          </div>
+
+          <!-- Editing Breakdown Section -->
+          <div class="modal-breakdown-section">
+            <span class="modal-section-tag">EDITING BREAKDOWN</span>
+            
+            <!-- Tabs -->
+            <div class="breakdown-tabs" role="tablist" aria-label="Breakdown stages">
+              <button class="breakdown-tab active" data-tab="RAW" data-testid="breakdown-tab-raw">RAW</button>
+              <button class="breakdown-tab" data-tab="EDIT" data-testid="breakdown-tab-edit">EDIT</button>
+              <button class="breakdown-tab" data-tab="COLOR" data-testid="breakdown-tab-color">COLOR</button>
+              <button class="breakdown-tab" data-tab="MOTION" data-testid="breakdown-tab-motion">MOTION</button>
+              <button class="breakdown-tab" data-tab="SOUND" data-testid="breakdown-tab-sound">SOUND</button>
+              <button class="breakdown-tab" data-tab="FINAL" data-testid="breakdown-tab-final">FINAL</button>
+            </div>
+
+            <!-- Breakdown content panel -->
+            <div class="breakdown-content-grid">
+              <div class="breakdown-media-column" id="modalBreakdownMedia">
+                <!-- Injected dynamically by JS -->
+              </div>
+              <div class="breakdown-text-column">
+                <p class="breakdown-text" id="modalBreakdownDesc">Breakdown stage text</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop" id="modalBackdrop" hidden></div>
+    <!-- ===================== ABOUT ===================== -->
+    <section class="about section-pad" id="about" aria-label="About" data-testid="about-section">
+      <div class="section-label">
+        <span class="section-label-index">02</span>
+        <span class="section-label-line" aria-hidden="true"></span>
+        <span class="section-label-text">ABOUT</span>
+      </div>
+
+      <h2 class="section-heading reveal">
+        <span class="line"><span class="line-inner" style="--line-delay:0s">BEHIND</span></span>
+        <span class="line"><span class="line-inner" style="--line-delay:0.13s">THE EDIT</span></span>
+      </h2>
+
+      <div class="about-grid">
+
+        <!-- Portrait column -->
+        <div class="about-portrait reveal">
+          <div class="about-portrait-frame">
+            <span class="portrait-corner portrait-corner-tl" aria-hidden="true"></span>
+            <span class="portrait-corner portrait-corner-br" aria-hidden="true"></span>
+            <div class="portrait-img-wrap">
+              <!-- PHOTO: replace src with public/images/profile/profile.jpg when ready -->
+              <div class="portrait-placeholder" aria-label="Portrait placeholder">
+                <img
+                  src="public/images/profile/profile.jpg"
+                  alt="Portrait of Alex Mercer"
+                  loading="lazy"
+                  class="portrait-img"
+                  onerror="this.style.display='none';this.parentElement.classList.add('portrait-fallback')"
+                />
+              </div>
+            </div>
+            <p class="portrait-caption">ALEX MERCER — VIDEO EDITOR &amp; MOTION DESIGNER</p>
+          </div>
+        </div>
+
+        <!-- Text + facts column -->
+        <div class="about-content">
+          <div class="about-paragraphs">
+            <p class="about-para about-para-primary reveal">
+              I'm a video editor focused on transforming raw footage into engaging visual stories. The timeline is where I think — pacing, rhythm and emotion are decided frame by frame.
+            </p>
+            <p class="about-para about-para-secondary reveal" style="--reveal-delay:0.1s">
+              My work combines editing, motion graphics, visual effects, sound design and color to create videos that are visually strong and emotionally engaging. If it doesn't serve the story, it doesn't make the cut.
+            </p>
+          </div>
+
+          <!-- Facts bento grid -->
+          <dl class="about-facts reveal" style="--reveal-delay:0.2s">
+            <div class="about-fact">
+              <dt class="about-fact-label">LOCATION</dt>
+              <dd class="about-fact-value">Your City, Country</dd>
+            </div>
+            <div class="about-fact">
+              <dt class="about-fact-label">EXPERIENCE</dt>
+              <dd class="about-fact-value">4+ Years</dd>
+            </div>
+            <div class="about-fact">
+              <dt class="about-fact-label">SPECIALTIES</dt>
+              <dd class="about-fact-value">Cinematic Edits / Motion Graphics / Color</dd>
+            </div>
+          </dl>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================== SERVICES ===================== -->
+    <section class="services section-pad" id="services" aria-label="Services">
+      <div class="section-label">
+        <span class="section-label-index">03</span>
+        <span class="section-label-line" aria-hidden="true"></span>
+        <span class="section-label-text">SERVICES / SPECIALIZATIONS</span>
+      </div>
+
+      <h2 class="section-heading reveal">
+        <span class="line"><span class="line-inner" style="--line-delay:0s">WHAT I DO</span></span>
+      </h2>
+
+      <div class="services-list">
+
+        <!-- Service Row 1 -->
+        <div class="service-row reveal" data-testid="service-video-editing">
+          <span class="service-row-number">01</span>
+          <h3 class="service-row-title">VIDEO EDITING</h3>
+          <ul class="service-row-items" role="list">
+            <li>Cinematic Editing</li>
+            <li>YouTube Editing</li>
+            <li>Short-form Content</li>
+            <li>Commercial Editing</li>
+            <li>Trailer Editing</li>
+          </ul>
+        </div>
+
+        <!-- Service Row 2 -->
+        <div class="service-row reveal" style="--reveal-delay:0.05s" data-testid="service-motion-graphics">
+          <span class="service-row-number">02</span>
+          <h3 class="service-row-title">MOTION GRAPHICS</h3>
+          <ul class="service-row-items" role="list">
+            <li>Animated Typography</li>
+            <li>Logo Animation</li>
+            <li>UI Animation</li>
+            <li>Transitions</li>
+            <li>Infographics</li>
+          </ul>
+        </div>
+
+        <!-- Service Row 3 -->
+        <div class="service-row reveal" style="--reveal-delay:0.1s" data-testid="service-visual-effects">
+          <span class="service-row-number">03</span>
+          <h3 class="service-row-title">VISUAL EFFECTS</h3>
+          <ul class="service-row-items" role="list">
+            <li>Compositing</li>
+            <li>Green Screen</li>
+            <li>Tracking</li>
+            <li>Rotoscoping</li>
+            <li>Screen Replacement</li>
+          </ul>
+        </div>
+
+        <!-- Service Row 4 -->
+        <div class="service-row reveal" style="--reveal-delay:0.15s" data-testid="service-color">
+          <span class="service-row-number">04</span>
+          <h3 class="service-row-title">COLOR</h3>
+          <ul class="service-row-items" role="list">
+            <li>Color Correction</li>
+            <li>Color Grading</li>
+            <li>Look Development</li>
+          </ul>
+        </div>
+
+        <!-- Service Row 5 -->
+        <div class="service-row reveal" style="--reveal-delay:0.2s" data-testid="service-sound">
+          <span class="service-row-number">05</span>
+          <h3 class="service-row-title">SOUND</h3>
+          <ul class="service-row-items" role="list">
+            <li>Sound Design</li>
+            <li>SFX</li>
+            <li>Music Editing</li>
+            <li>Audio Mixing</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================== SOFTWARE ===================== -->
+    <section class="software section-pad" id="software" aria-label="Software" data-testid="software-section">
+      <div class="section-label">
+        <span class="section-label-index">04</span>
+        <span class="section-label-line" aria-hidden="true"></span>
+        <span class="section-label-text">TOOLKIT</span>
+      </div>
+
+      <h2 class="section-heading reveal">
+        <span class="line"><span class="line-inner" style="--line-delay:0s">THE TOOLKIT</span></span>
+      </h2>
+
+      <div class="software-grid reveal">
+
+        <div class="software-card" data-testid="software-editing">
+          <span class="software-cat">EDITING</span>
+          <ul class="software-tools">
+            <li>Premiere Pro</li>
+            <li>DaVinci Resolve</li>
+          </ul>
+        </div>
+
+        <div class="software-card" data-testid="software-motion">
+          <span class="software-cat">MOTION</span>
+          <ul class="software-tools">
+            <li>After Effects</li>
+          </ul>
+        </div>
+
+        <div class="software-card" data-testid="software-design">
+          <span class="software-cat">DESIGN</span>
+          <ul class="software-tools">
+            <li>Photoshop</li>
+            <li>Illustrator</li>
+          </ul>
+        </div>
+
+        <div class="software-card" data-testid="software-3d">
+          <span class="software-cat">3D</span>
+          <ul class="software-tools">
+            <li>Blender</li>
+          </ul>
+        </div>
+
+        <div class="software-card" data-testid="software-audio">
+          <span class="software-cat">AUDIO</span>
+          <ul class="software-tools">
+            <li>Audition</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================== PROCESS ===================== -->
+    <section class="process section-pad" id="process" aria-label="Editing process" data-testid="workflow-section">
+      <div class="section-label">
+        <span class="section-label-index">05</span>
+        <span class="section-label-line" aria-hidden="true"></span>
+        <span class="section-label-text">EDITING PROCESS</span>
+      </div>
+
+      <h2 class="section-heading reveal">
+        <span class="line"><span class="line-inner" style="--line-delay:0s">FROM RAW</span></span>
+        <span class="line"><span class="line-inner" style="--line-delay:0.13s">TO FINAL</span></span>
+      </h2>
+
+      <div class="process-grid reveal" role="tablist" aria-label="Editing process steps">
+
+        <button class="process-card" data-step="0" role="tab" aria-selected="false" aria-controls="process-desc">
+          <span class="process-card-num">01</span>
+          <span class="process-card-title">RAW FOOTAGE</span>
+        </button>
+        <button class="process-card" data-step="1" role="tab" aria-selected="false" aria-controls="process-desc">
+          <span class="process-card-num">02</span>
+          <span class="process-card-title">SELECTS</span>
+        </button>
+        <button class="process-card active" data-step="2" role="tab" aria-selected="true" aria-controls="process-desc">
+          <span class="process-card-num">03</span>
+          <span class="process-card-title">ROUGH CUT</span>
+        </button>
+        <button class="process-card" data-step="3" role="tab" aria-selected="false" aria-controls="process-desc">
+          <span class="process-card-num">04</span>
+          <span class="process-card-title">FINE CUT</span>
+        </button>
+        <button class="process-card" data-step="4" role="tab" aria-selected="false" aria-controls="process-desc">
+          <span class="process-card-num">05</span>
+          <span class="process-card-title">MOTION</span>
+        </button>
+        <button class="process-card" data-step="5" role="tab" aria-selected="false" aria-controls="process-desc">
+          <span class="process-card-num">06</span>
+          <span class="process-card-title">COLOR</span>
+        </button>
+        <button class="process-card" data-step="6" role="tab" aria-selected="false" aria-controls="process-desc">
+          <span class="process-card-num">07</span>
+          <span class="process-card-title">SOUND</span>
+        </button>
+        <button class="process-card" data-step="7" role="tab" aria-selected="false" aria-controls="process-desc">
+          <span class="process-card-num">08</span>
+          <span class="process-card-title">FINAL</span>
+        </button>
+
+      </div>
+
+      <div class="process-desc-wrap" id="process-desc" role="tabpanel">
+        <p id="processDescText">
+          <span class="process-desc-title">ROUGH CUT</span>
+          Establishing structure, pacing and narrative flow.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== EXPERIENCE ===================== -->
+    <section class="experience section-pad" id="experience" aria-label="Experience" data-testid="experience-section">
+      <div class="section-label">
+        <span class="section-label-index">06</span>
+        <span class="section-label-line" aria-hidden="true"></span>
+        <span class="section-label-text">EXPERIENCE</span>
+      </div>
+
+      <h2 class="section-heading reveal">
+        <span class="line"><span class="line-inner" style="--line-delay:0s">SELECTED</span></span>
+        <span class="line"><span class="line-inner" style="--line-delay:0.13s">EXPERIENCE</span></span>
+      </h2>
+
+      <div class="timeline">
+
+        <div class="timeline-item reveal">
+          <div class="timeline-year">2026</div>
+          <div class="timeline-role-wrap">
+            <h3 class="timeline-role">VIDEO EDITOR</h3>
+            <p class="timeline-place">FREELANCE</p>
+          </div>
+          <p class="timeline-desc">Leading end-to-end edits for brand and creator clients — from raw footage to final delivery.</p>
+        </div>
+
+        <div class="timeline-item reveal" style="--reveal-delay:0.06s">
+          <div class="timeline-year">2025</div>
+          <div class="timeline-role-wrap">
+            <h3 class="timeline-role">MOTION DESIGN</h3>
+            <p class="timeline-place">STUDIO PROJECTS</p>
+          </div>
+          <p class="timeline-desc">Animated typography, title sequences and motion systems for campaigns.</p>
+        </div>
+
+        <div class="timeline-item reveal" style="--reveal-delay:0.12s">
+          <div class="timeline-year">2024</div>
+          <div class="timeline-role-wrap">
+            <h3 class="timeline-role">VIDEO EDITING</h3>
+            <p class="timeline-place">FREELANCE</p>
+          </div>
+          <p class="timeline-desc">Short-form content, music edits and personal cinematic projects.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================== CONTACT ===================== -->
+    <section class="contact section-pad" id="contact" aria-label="Contact" data-testid="contact-section">
+      <div class="section-label">
+        <span class="section-label-index">07</span>
+        <span class="section-label-line" aria-hidden="true"></span>
+        <span class="section-label-text">CONTACT</span>
+      </div>
+
+      <h2 class="contact-heading reveal">
+        <span class="line"><span class="line-inner" style="--line-delay:0s">LET'S MAKE</span></span>
+        <span class="line"><span class="line-inner" style="--line-delay:0.13s">SOMETHING.</span></span>
+      </h2>
+
+      <p class="contact-availability reveal">
+        <span class="availability-dot" aria-hidden="true"></span>
+        AVAILABLE FOR PROJECTS — 2026
+      </p>
+
+      <div class="contact-grid">
+
+        <!-- Left: email + socials -->
+        <div class="contact-info reveal">
+          <div class="contact-email-block">
+            <p class="contact-block-label">EMAIL</p>
+            <button class="contact-email-btn" id="copyEmailBtn" data-testid="copy-email-btn" aria-label="Copy email address">
+              <span class="email-text">hello@yourname.com</span>
+              <span class="copy-icon" id="copyIcon" aria-hidden="true">
+                <!-- Copy icon -->
+                <svg class="icon-copy" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                <!-- Check icon (shown after copy) -->
+                <svg class="icon-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF3B30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden>
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+
+          <div class="contact-socials-block">
+            <p class="contact-block-label">ELSEWHERE</p>
+            <ul class="contact-social-list" role="list">
+              <li><a href="https://instagram.com/yourhandle" target="_blank" rel="noopener noreferrer" data-testid="social-instagram" class="contact-social-link">Instagram <svg class="social-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a></li>
+              <li><a href="https://youtube.com/@yourhandle"  target="_blank" rel="noopener noreferrer" data-testid="social-youtube"   class="contact-social-link">YouTube  <svg class="social-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a></li>
+              <li><a href="https://linkedin.com/in/yourhandle" target="_blank" rel="noopener noreferrer" data-testid="social-linkedin" class="contact-social-link">LinkedIn <svg class="social-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a></li>
+              <li><a href="https://vimeo.com/yourhandle"     target="_blank" rel="noopener noreferrer" data-testid="social-vimeo"     class="contact-social-link">Vimeo    <svg class="social-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Right: form -->
+        <div class="contact-form-wrap reveal" style="--reveal-delay:0.1s">
+          <form class="contact-form" id="contactForm" novalidate data-testid="contact-form">
+
+            <div class="form-row">
+              <div class="form-field">
+                <label for="contact-name" class="contact-label">NAME</label>
+                <input type="text" id="contact-name" name="name" data-testid="contact-name-input"
+                  class="contact-input" placeholder="Your name" required autocomplete="name" />
+              </div>
+              <div class="form-field">
+                <label for="contact-email" class="contact-label">EMAIL</label>
+                <input type="email" id="contact-email" name="email" data-testid="contact-email-input"
+                  class="contact-input" placeholder="you@company.com" required autocomplete="email" />
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="contact-type" class="contact-label">PROJECT TYPE</label>
+              <div class="select-wrap">
+                <select id="contact-type" name="project_type" data-testid="contact-type-select" class="contact-select" required>
+                  <option value="Cinematic Edit">Cinematic Edit</option>
+                  <option value="Commercial / Ad">Commercial / Ad</option>
+                  <option value="Short-form Content">Short-form Content</option>
+                  <option value="Music Video">Music Video</option>
+                  <option value="Motion Graphics">Motion Graphics</option>
+                  <option value="Other">Other</option>
+                </select>
+                <span class="select-arrow" aria-hidden="true">↓</span>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="contact-message" class="contact-label">PROJECT DETAILS</label>
+              <textarea id="contact-message" name="message" data-testid="contact-message-input"
+                class="contact-input contact-textarea" rows="4"
+                placeholder="Tell me about the footage, the deadline and the feeling you're after."
+                required></textarea>
+            </div>
+
+            <button type="submit" class="btn-contact-submit" data-testid="contact-submit-btn">
+              <span class="btn-submit-text">START A PROJECT</span>
+              <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
+
+            <div class="form-success" id="formSuccess" aria-live="polite" role="status">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF3B30" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              ENQUIRY SENT — I'll get back to you within 24 hours.
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer" role="contentinfo" data-testid="footer">
+    <div class="footer-inner">
+
+      <div class="footer-brand">
+        <p class="footer-name">&copy; 2026 ALEX MERCER</p>
+        <p class="footer-title">VIDEO EDITOR / MOTION DESIGNER</p>
+      </div>
+
+      <ul class="footer-social" role="list">
+        <li><a href="https://instagram.com/yourhandle" target="_blank" rel="noopener noreferrer" data-testid="footer-social-instagram" aria-label="Instagram">INSTAGRAM</a></li>
+        <li><a href="https://youtube.com/@yourhandle"  target="_blank" rel="noopener noreferrer" data-testid="footer-social-youtube"   aria-label="YouTube">YOUTUBE</a></li>
+        <li><a href="https://linkedin.com/in/yourhandle" target="_blank" rel="noopener noreferrer" data-testid="footer-social-linkedin" aria-label="LinkedIn">LINKEDIN</a></li>
+        <li><a href="https://vimeo.com/yourhandle"     target="_blank" rel="noopener noreferrer" data-testid="footer-social-vimeo"     aria-label="Vimeo">VIMEO</a></li>
+      </ul>
+
+      <button class="back-to-top" data-testid="back-to-top-btn" aria-label="Back to top">
+        BACK TO TOP
+        <svg class="arrow-up-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+        </svg>
+      </button>
+
+    </div>
+  </footer>
+
+  <!-- Lenis smooth scroll -->
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <!--
+    BACKEND: to connect the FastAPI backend, add before the scripts below:
+    <script>window.FF_API_URL = "https://your-backend-url.com";</script>
+    See BACKEND.md for full setup instructions.
+  -->
+  <script src="js/main.js"></script>
+</body>
+</html>
