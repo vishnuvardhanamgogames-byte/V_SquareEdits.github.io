@@ -247,13 +247,13 @@ async function apiFetch(path, options = {}) {
    VIEWS CONTROL
    ============================================================ */
 function showLogin() {
-  $('loginPage').hidden  = false;
-  $('dashboard').hidden  = true;
+  $('loginPage').style.display = 'flex';
+  $('dashboard').style.display = 'none';
 }
 
 function showDashboard() {
-  $('loginPage').hidden  = true;
-  $('dashboard').hidden  = false;
+  $('loginPage').style.display = 'none';
+  $('dashboard').style.display = 'block';
   
   // Refresh tabs on login
   switchTab('enquiries');
