@@ -266,58 +266,8 @@ async function apiFetch(path, options = {}) {
 }
 
 /* ============================================================
-   GITHUB TOKEN — persistent storage helpers
+   VIEWS CONTROL
    ============================================================ */
-const GH_TOKEN_KEY = 'ff_gh_token';
-
-function getStoredToken() {
-  return localStorage.getItem(GH_TOKEN_KEY) || '';
-}
-
-function saveToken(t) {
-  localStorage.setItem(GH_TOKEN_KEY, t.trim());
-}
-
-function clearToken() {
-  localStorage.removeItem(GH_TOKEN_KEY);
-}
-
-/** Update the token UI: show "connected" state or the input form */
-function refreshTokenUI() {
-  const token      = getStoredToken();
-  const setupEl    = $('ghTokenSetup');
-  const connEl     = $('ghTokenConnected');
-  if (!setupEl || !connEl) return;
-  if (token) {
-    setupEl.style.display   = 'none';
-    connEl.style.display    = 'flex';
-  } else {
-    setupEl.style.display   = 'flex';
-    connEl.style.display    = 'none';
-  }
-}
-
-/* ============================================================
-   PUBLISH STATUS BAR
-   ============================================================ */
-function showPublishBar(icon, text, showLink = false) {
-  const bar     = $('publishStatusBar');
-  const iconEl  = $('publishStatusIcon');
-  const textEl  = $('publishStatusText');
-  const linkEl  = $('publishViewLink');
-  if (!bar) return;
-  bar.style.display  = 'flex';
-  if (iconEl) iconEl.textContent = icon;
-  if (textEl) textEl.textContent = text;
-  if (linkEl) linkEl.style.display = showLink ? 'inline' : 'none';
-}
-
-function hidePublishBar() {
-  const bar = $('publishStatusBar');
-  if (bar) bar.style.display = 'none';
-}
-
-
 function showLogin() {
   $('loginPage').style.display = 'flex';
   $('dashboard').style.display = 'none';
@@ -326,7 +276,8 @@ function showLogin() {
 function showDashboard() {
   $('loginPage').style.display = 'none';
   $('dashboard').style.display = 'block';
-  refreshTokenUI();
+  
+  // Default to profile tab on login
   switchTab('profile');
 }
 
@@ -805,97 +756,20 @@ function renderToolkitEditor(toolkit) {
 
 /**
  * Returns a deep copy of data with base64 data URLs replaced by empty strings.
- * This keeps localStorage usage small while the full data (with images) lives in memory.
+ * Base64 images are too large for GitHub API — store URLs only.
  */
 function stripBase64ForStorage(data) {
   const json = JSON.stringify(data);
-  // Replace all base64 data URLs (data:image/...;base64,...) with a placeholder
   const stripped = json.replace(/"data:[^"]{0,20};base64,[^"]+"/g, '""');
   try {
     return JSON.parse(stripped);
   } catch {
-    return data; // fallback — return original if parsing fails
+    return data;
   }
-}
-
-/**
- * FILE SYSTEM ACCESS API
- * Lets the user pick data.json once — after that every save writes
- * directly to that file on disk. No manual copy/replace needed.
- *
- * fileHandle is stored in memory (survives the session).
- * On next login the user is prompted once to re-pick the file.
- */
-let _fileHandle = null; // persists for the lifetime of the tab
-
-/**
- * Ask the user to pick data.json from their project folder.
- * Called automatically on first save if no handle is stored yet.
- */
-async function pickDataJsonFile() {
-  if (!('showSaveFilePicker' in window)) return null; // API not supported
-  try {
-    const handle = await window.showSaveFilePicker({
-      suggestedName: 'data.json',
-      types: [{ description: 'JSON file', accept: { 'application/json': ['.json'] } }],
-      startIn: 'desktop',
-    });
-    _fileHandle = handle;
-    return handle;
-  } catch (e) {
-    // User cancelled — that's fine
-    return null;
-  }
-}
-
-/**
- * Write data directly to data.json on disk using the stored file handle.
- * Falls back to download if the API isn't supported or user never picked a file.
- */
-async function writeDataJsonToDisk(data) {
-  const json = JSON.stringify(data, null, 2);
-
-  // Try File System Access API first (Chrome/Edge on desktop)
-  if ('showSaveFilePicker' in window) {
-    // First save: ask user to pick/confirm the file location once
-    if (!_fileHandle) {
-      toast('📂 Pick your data.json file to enable auto-save…');
-      _fileHandle = await pickDataJsonFile();
-    }
-
-    if (_fileHandle) {
-      try {
-        const writable = await _fileHandle.createWritable();
-        await writable.write(json);
-        await writable.close();
-        toast('✓ data.json updated on disk automatically!');
-        return;
-      } catch (e) {
-        // Permission may have expired — re-prompt next time
-        _fileHandle = null;
-        toast('Auto-save permission lost. Re-save to re-connect the file.', 'error');
-      }
-    }
-  }
-
-  // Fallback: download the file (Firefox, or if user cancelled the picker)
-  try {
-    const blob = new Blob([json], { type: 'application/json' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = 'data.json';
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
-    toast('✓ data.json downloaded — replace the file in your Web02 folder.');
-  } catch (_) { /* ignore */ }
 }
 
 /**
  * Compress an image File to a JPEG data URL at reduced quality/size.
- * Used before storing images so drag-and-drop uploads stay manageable.
  */
 function compressImage(file, maxWidth = 800, quality = 0.72) {
   return new Promise((resolve) => {
@@ -911,8 +785,7 @@ function compressImage(file, maxWidth = 800, quality = 0.72) {
         }
         canvas.width  = width;
         canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
         resolve(canvas.toDataURL('image/jpeg', quality));
       };
       img.src = e.target.result;
@@ -922,21 +795,18 @@ function compressImage(file, maxWidth = 800, quality = 0.72) {
 }
 
 async function saveLocalPreview() {
-  const form = $('websiteEditorForm');
-  if (form && !form.checkValidity()) {
-    form.reportValidity();
+  // ── Get GitHub token (required) ────────────────────────────
+  const ghToken = localStorage.getItem('ff_gh_token') || '';
+
+  if (!ghToken) {
+    // Show the token setup panel instead of saving
+    showTokenSetup();
     return;
   }
 
-  // Get stored GitHub token — set once, remembered forever
-  const ghToken = getStoredToken();
-  if ($('editGithubToken') && !ghToken) {
-    // token input visible — pick up whatever is typed
-    const typed = $('editGithubToken').value.trim();
-    if (typed) saveToken(typed);
-  }
+  // Disable all save buttons while publishing
+  setSaveButtonsState(true);
 
-  // Helper to safely get input value
   const val = (id) => { const el = $(id); return el ? el.value.trim() : ''; };
 
   // Serialize services
@@ -963,11 +833,9 @@ async function saveLocalPreview() {
     desc:  card.querySelector('.exp-desc')  ? card.querySelector('.exp-desc').value.trim()  : '',
   }));
 
-  // Construct updated data object
+  // Build updated data object
   const updatedData = {
-    nav: {
-      logoText: val('editName') || (portfolioData.nav ? portfolioData.nav.logoText : '')
-    },
+    nav: { logoText: val('editName') || (portfolioData.nav ? portfolioData.nav.logoText : '') },
     hero: {
       eyebrow: val('editHeroEyebrow'),
       headlineLines: portfolioData.hero ? portfolioData.hero.headlineLines : ['CUTTING', 'STORIES INTO', 'MOTION.'],
@@ -1005,27 +873,39 @@ async function saveLocalPreview() {
     projects: serializeProjects()
   };
 
-  try {
-    const storableData = stripBase64ForStorage(updatedData);
-    localStorage.setItem('portfolio_data', JSON.stringify(storableData));
-    portfolioData = updatedData;
-    writeDataJsonToDisk(storableData);
-  } catch (e) {
-    portfolioData = updatedData;
-  }
+  // Strip base64 images (too large for GitHub API) — keep URLs only
+  const publishData = stripBase64ForStorage(updatedData);
+  portfolioData = updatedData; // keep in memory
 
-  // Always auto-publish to GitHub if a token is stored
-  const token = getStoredToken();
-  if (token) {
-    await publishToGithub(updatedData, token);
-  } else {
-    toast('Saved locally. Paste your GitHub Token above to publish live automatically.', 'error');
-  }
+  // Push directly to GitHub
+  await publishToGithub(publishData, ghToken);
+
+  setSaveButtonsState(false);
 }
 
+function setSaveButtonsState(disabled) {
+  document.querySelectorAll('.btn-pill-save').forEach(btn => {
+    btn.disabled = disabled;
+    btn.textContent = disabled ? 'PUBLISHING…' : btn.getAttribute('data-label') || btn.textContent.replace('PUBLISHING…', '') || 'SAVE';
+  });
+}
+
+function showTokenSetup() {
+  // Scroll to token bar and highlight it
+  const bar = $('tokenBar');
+  if (bar) {
+    bar.scrollIntoView({ behavior: 'smooth' });
+    bar.style.borderColor = 'var(--color-accent)';
+    setTimeout(() => { bar.style.borderColor = ''; }, 2500);
+  }
+  const input = $('editGithubToken');
+  if (input) input.focus();
+  toast('Paste your GitHub token first to enable publishing.', 'error');
+}
 
 async function publishToGithub(updatedData, token) {
-  showPublishBar('⏳', 'Publishing to GitHub…');
+  const statusAlert = $('publishStatusAlert');
+  if (statusAlert) statusAlert.style.display = 'none';
 
   try {
     const owner = 'vishnuvardhanamgogames-byte';
@@ -1038,21 +918,12 @@ async function publishToGithub(updatedData, token) {
       { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } }
     );
 
-    if (!getRes.ok) {
-      if (getRes.status === 401) {
-        clearToken();
-        refreshTokenUI();
-        throw new Error('GitHub token is invalid or expired. Please paste a new token.');
-      }
-      throw new Error(`GitHub error ${getRes.status} — check your token permissions.`);
-    }
+    if (!getRes.ok) throw new Error(`GitHub error ${getRes.status} — check your token.`);
 
     const { sha } = await getRes.json();
 
-    // 2. Write updated data.json (strip base64 so file stays small)
-    const payload     = stripBase64ForStorage(updatedData);
-    const jsonString  = JSON.stringify(payload, null, 2);
-    const contentB64  = btoa(unescape(encodeURIComponent(jsonString)));
+    // 2. Write new content
+    const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(updatedData, null, 2))));
 
     const putRes = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
@@ -1064,8 +935,8 @@ async function publishToGithub(updatedData, token) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          message: 'Admin CMS update',
-          content: contentB64,
+          message: 'Update portfolio via Admin CMS',
+          content: contentBase64,
           sha,
           branch: 'main'
         })
@@ -1074,20 +945,21 @@ async function publishToGithub(updatedData, token) {
 
     if (!putRes.ok) {
       const err = await putRes.json().catch(() => ({}));
-      throw new Error(err.message || `GitHub write failed (${putRes.status}).`);
+      throw new Error(err.message || `GitHub write failed (${putRes.status})`);
     }
 
-    // Success
-    showPublishBar('✅', 'Published! Site updates in ~60 seconds.', true);
-    toast('✓ Published to GitHub — site will update in ~1 minute.');
-    setTimeout(hidePublishBar, 8000);
+    toast('🚀 Published! Live site updates in ~1 minute.');
+    if (statusAlert) {
+      statusAlert.style.display = 'block';
+      statusAlert.scrollIntoView({ behavior: 'smooth' });
+    }
 
   } catch (err) {
-    showPublishBar('❌', err.message || 'Publish failed.');
+    console.error(err);
     toast(err.message || 'Failed to publish to GitHub.', 'error');
-    setTimeout(hidePublishBar, 10000);
   }
 }
+
 
 function serializeProjects() {
   // Only grab project cards inside #projectsEditorList to avoid grabbing experience cards
@@ -1378,47 +1250,32 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Logout ─────────────────────────────────────────────────
   $('logoutBtn').addEventListener('click', logout);
 
-  // ── GitHub Token — save / clear ────────────────────────────
-  const saveTokenBtn = $('saveGhTokenBtn');
+  // ── Token bar: save token & update UI ─────────────────────
+  function updateTokenBar() {
+    const saved = localStorage.getItem('ff_gh_token') || '';
+    const label = $('tokenBarLabel');
+    const input = $('editGithubToken');
+    if (saved) {
+      if (label) { label.textContent = '✓ GitHub token saved — saves publish live automatically'; label.style.color = 'var(--color-accent)'; }
+      if (input) input.value = saved;
+    } else {
+      if (label) { label.textContent = 'GitHub token not set — paste your token to enable live publishing'; label.style.color = '#A0A0A0'; }
+    }
+  }
+
+  const saveTokenBtn = $('saveTokenBtn');
   if (saveTokenBtn) {
     saveTokenBtn.addEventListener('click', () => {
       const input = $('editGithubToken');
       const t = input ? input.value.trim() : '';
-      if (!t) { toast('Please paste your GitHub token first.', 'error'); return; }
-      saveToken(t);
-      refreshTokenUI();
-      toast('✓ GitHub token saved — all saves will now publish live automatically.');
+      if (!t) { toast('Paste your GitHub token first.', 'error'); return; }
+      localStorage.setItem('ff_gh_token', t);
+      updateTokenBar();
+      toast('✓ Token saved! Every save now publishes live to GitHub.');
     });
   }
 
-  const clearTokenBtn = $('clearGhTokenBtn');
-  if (clearTokenBtn) {
-    clearTokenBtn.addEventListener('click', () => {
-      clearToken();
-      refreshTokenUI();
-      const input = $('editGithubToken');
-      if (input) input.value = '';
-      toast('GitHub token cleared.');
-    });
-  }
-
-  // ── Connect data.json file for auto-save ──────────────────
-  const connectBtn = $('connectFileBtn');
-  if (connectBtn) {
-    connectBtn.addEventListener('click', async () => {
-      _fileHandle = null; // reset so picker is shown
-      const handle = await pickDataJsonFile();
-      const statusEl = $('connectFileStatus');
-      if (handle && statusEl) {
-        statusEl.textContent = '✓ Connected: ' + handle.name;
-        statusEl.style.color = 'var(--color-accent)';
-        toast('✓ data.json connected! All saves now write directly to your file.');
-      } else if (statusEl) {
-        statusEl.textContent = 'Not connected (saves will download instead)';
-        statusEl.style.color = '#555';
-      }
-    });
-  }
+  updateTokenBar();
 
   // ── Refresh enquiries ──────────────────────────────────────
   $('refreshBtn').addEventListener('click', () => {
