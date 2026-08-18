@@ -446,6 +446,8 @@ async function loadCMSData() {
   }
 
   populateEditorForm();
+  // Re-wire drop zones after values are set so existing images show as previews
+  setTimeout(() => initImageDropZones(), 0);
 }
 
 function populateEditorForm() {
@@ -507,8 +509,15 @@ function renderProjectEditors(projects) {
         <div style="border-left: 2px solid #222; padding-left: 12px; margin-top: 8px;">
           <span style="font-size:10px; font-weight:700; color:var(--color-accent); letter-spacing:0.05em;">${s} STAGE</span>
           <div class="form-field" style="margin-top: 6px;">
-            <label class="admin-label">Image URL</label>
-            <input type="url" class="admin-input stage-${s.toLowerCase()}-image" required value="${escHtml(stageData.image)}" placeholder="https://..." />
+            <label class="admin-label">Stage Image</label>
+            <div class="img-drop-zone" data-target="stage-${s.toLowerCase()}-image" role="button" tabindex="0" aria-label="Upload ${s} stage image">
+              <input type="file" accept="image/*" aria-label="Choose ${s} stage image file" />
+              <svg class="img-drop-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p class="img-drop-label"><span>Choose a file</span> or drag it here</p>
+              ${stageData.image ? `<img class="img-drop-preview visible" src="${escHtml(stageData.image)}" alt="${s} stage preview" />` : `<img class="img-drop-preview" alt="${s} stage preview" />`}
+              <button type="button" class="img-drop-clear${stageData.image ? ' visible' : ''}">✕ REMOVE</button>
+            </div>
+            <input type="hidden" class="stage-${s.toLowerCase()}-image" value="${escHtml(stageData.image)}" />
           </div>
           <div class="form-field" style="margin-top: 4px;">
             <label class="admin-label">Description</label>
@@ -549,8 +558,15 @@ function renderProjectEditors(projects) {
           <input type="url" class="admin-input p-video" required value="${escHtml(p.video)}" />
         </div>
         <div class="form-field" style="margin-top: 0;">
-          <label class="admin-label">Poster/Thumbnail Image URL</label>
-          <input type="url" class="admin-input p-image" required value="${escHtml(p.image)}" />
+          <label class="admin-label">Poster / Thumbnail Image</label>
+          <div class="img-drop-zone" data-target="p-image" role="button" tabindex="0" aria-label="Upload project thumbnail">
+            <input type="file" accept="image/*" aria-label="Choose project thumbnail file" />
+            <svg class="img-drop-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p class="img-drop-label"><span>Choose a file</span> or drag it here</p>
+            ${p.image ? `<img class="img-drop-preview visible" src="${escHtml(p.image)}" alt="Project thumbnail preview" />` : `<img class="img-drop-preview" alt="Project thumbnail preview" />`}
+            <button type="button" class="img-drop-clear${p.image ? ' visible' : ''}">✕ REMOVE</button>
+          </div>
+          <input type="hidden" class="p-image" value="${escHtml(p.image || '')}" />
         </div>
       </div>
       
@@ -568,6 +584,7 @@ function renderProjectEditors(projects) {
     `;
 
     container.appendChild(card);
+    initImageDropZones(card); // wire drop zones for this project card
   });
 }
 
@@ -834,6 +851,135 @@ function saveEnquiryLocally(payload) {
 window.FF_saveEnquiry = saveEnquiryLocally;
 
 /* ============================================================
+   DRAG & DROP IMAGE UPLOAD HELPER
+   ============================================================ */
+
+/**
+ * Bind a drag-and-drop upload zone.
+ * @param {HTMLElement} zone  - the .img-drop-zone element
+ * @param {HTMLInputElement} hiddenInput - the hidden input that stores the value
+ */
+function bindDropZone(zone, hiddenInput) {
+  if (!zone || !hiddenInput) return;
+
+  const fileInput  = zone.querySelector('input[type="file"]');
+  const preview    = zone.querySelector('.img-drop-preview');
+  const clearBtn   = zone.querySelector('.img-drop-clear');
+
+  function applyImage(src) {
+    hiddenInput.value = src;
+    if (preview) {
+      preview.src = src;
+      preview.classList.add('visible');
+    }
+    if (clearBtn) clearBtn.classList.add('visible');
+  }
+
+  function clearImage() {
+    hiddenInput.value = '';
+    if (preview) {
+      preview.src = '';
+      preview.classList.remove('visible');
+    }
+    if (clearBtn) clearBtn.classList.remove('visible');
+    if (fileInput) fileInput.value = '';
+  }
+
+  // Populate preview if hidden input already has a value (on form load)
+  if (hiddenInput.value) {
+    if (preview) {
+      preview.src = hiddenInput.value;
+      preview.classList.add('visible');
+    }
+    if (clearBtn) clearBtn.classList.add('visible');
+  }
+
+  // File chosen via the native picker
+  if (fileInput) {
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      readFileAsDataURL(file, applyImage);
+    });
+  }
+
+  // Drag events
+  zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    zone.classList.add('drag-over');
+  });
+
+  zone.addEventListener('dragleave', (e) => {
+    if (!zone.contains(e.relatedTarget)) {
+      zone.classList.remove('drag-over');
+    }
+  });
+
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      readFileAsDataURL(file, applyImage);
+    } else {
+      toast('Please drop an image file.', 'error');
+    }
+  });
+
+  // Keyboard accessibility
+  zone.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (fileInput) fileInput.click();
+    }
+  });
+
+  // Clear button
+  if (clearBtn) {
+    clearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      clearImage();
+    });
+  }
+}
+
+function readFileAsDataURL(file, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => callback(e.target.result);
+  reader.readAsDataURL(file);
+}
+
+/**
+ * Wire up all drop zones in a given container (or document).
+ * For zones with data-target, finds the hidden input by class within the same card.
+ */
+function initImageDropZones(container) {
+  const root = container || document;
+
+  // Fixed zones by ID
+  const fixedZones = [
+    { zoneId: 'dropHeroBg',   inputId: 'editHeroBgImage'       },
+    { zoneId: 'dropPortrait', inputId: 'editAboutPortraitImage' },
+  ];
+
+  fixedZones.forEach(({ zoneId, inputId }) => {
+    const zone  = root.getElementById ? root.getElementById(zoneId) : null;
+    const input = root.getElementById ? root.getElementById(inputId) : null;
+    if (zone && input) bindDropZone(zone, input);
+  });
+
+  // Dynamic zones via data-target (project cards & stage images)
+  const dynamicZones = (container || document).querySelectorAll('.img-drop-zone[data-target]');
+  dynamicZones.forEach((zone) => {
+    const targetClass = zone.dataset.target;
+    // The hidden input is a sibling or within the same form-field
+    const parent = zone.closest('.form-field') || zone.parentElement;
+    const input  = parent ? parent.querySelector(`.${targetClass}`) : null;
+    if (input) bindDropZone(zone, input);
+  });
+}
+
+/* ============================================================
    EVENT LISTENERS
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -928,6 +1074,7 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.setItem('portfolio_data', JSON.stringify(freshData));
           portfolioData = freshData;
           populateEditorForm();
+          setTimeout(() => initImageDropZones(), 0);
           toast('Successfully reset and synced all details from GitHub!');
         } else {
           throw new Error('Failed to retrieve data.json from server.');
@@ -946,6 +1093,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Init ───────────────────────────────────────────────────
+  initImageDropZones(); // wire up fixed drop zones (portrait, hero bg)
+
   if (token) {
     showDashboard();
     loadEnquiries();

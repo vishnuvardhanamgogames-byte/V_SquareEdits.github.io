@@ -163,8 +163,15 @@
             <textarea id="editHeroSubtext" class="admin-input" style="border: 1px solid var(--color-border2); padding: 8px; background: transparent; min-height: 80px;" required></textarea>
           </div>
           <div class="form-field" style="margin-top: 0;">
-            <label for="editHeroBgImage" class="admin-label">Hero Background Image URL / Path</label>
-            <input type="text" id="editHeroBgImage" class="admin-input" required placeholder="public/images/projects/hero_workspace.jpg or https://..." />
+            <label class="admin-label">Hero Background Image</label>
+            <div class="img-drop-zone" id="dropHeroBg" role="button" tabindex="0" aria-label="Upload hero background image">
+              <input type="file" accept="image/*" id="fileHeroBg" aria-label="Choose hero background image file" />
+              <svg class="img-drop-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p class="img-drop-label"><span>Choose a file</span> or drag it here</p>
+              <img class="img-drop-preview" id="previewHeroBg" alt="Hero background preview" />
+              <button type="button" class="img-drop-clear" id="clearHeroBg">✕ REMOVE</button>
+            </div>
+            <input type="hidden" id="editHeroBgImage" />
           </div>
           <div class="form-field" style="margin-top: 0;">
             <label for="editHeroShowreel" class="admin-label">Showreel Video Link (Direct MP4 or stream URL)</label>
@@ -189,8 +196,15 @@
             <input type="text" id="editPortraitCaption" class="admin-input" required placeholder="ALEX MERCER — VIDEO EDITOR" />
           </div>
           <div class="form-field" style="margin-top: 0;">
-            <label for="editAboutPortraitImage" class="admin-label">Portrait Image URL / Path</label>
-            <input type="text" id="editAboutPortraitImage" class="admin-input" required placeholder="public/images/profile/profile.jpg or https://..." />
+            <label class="admin-label">Portrait Image</label>
+            <div class="img-drop-zone" id="dropPortrait" role="button" tabindex="0" aria-label="Upload portrait image">
+              <input type="file" accept="image/*" id="filePortrait" aria-label="Choose portrait image file" />
+              <svg class="img-drop-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p class="img-drop-label"><span>Choose a file</span> or drag it here</p>
+              <img class="img-drop-preview" id="previewPortrait" alt="Portrait preview" />
+              <button type="button" class="img-drop-clear" id="clearPortrait">✕ REMOVE</button>
+            </div>
+            <input type="hidden" id="editAboutPortraitImage" />
           </div>
           <div class="form-field" style="margin-top: 0;">
             <label for="editBioParagraph1" class="admin-label">Bio Paragraph 1</label>
