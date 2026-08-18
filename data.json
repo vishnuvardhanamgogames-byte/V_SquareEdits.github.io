@@ -1,6 +1,7 @@
 {
   "nav": {
-    "logoText": "vishnuvardhan"
+    "logoText": "vishnuvardhan",
+    "logoImage": ""
   },
   "hero": {
     "eyebrow": "VIDEO EDITOR — MOTION • STORY • IMPACT",
@@ -23,6 +24,9 @@
     "MOTION"
   ],
   "about": {
+    "name": "vishnuvardhan",
+    "availability": "Available for work",
+    "cv": "",
     "headingLines": [
       "BEHIND",
       "THE EDIT"
@@ -167,7 +171,10 @@
     "instagram": "https://instagram.com/yourhandle",
     "youtube": "https://youtube.com/@yourhandle",
     "linkedin": "https://linkedin.com/in/yourhandle",
-    "vimeo": "https://vimeo.com/yourhandle"
+    "vimeo": "https://vimeo.com/yourhandle",
+    "github": "https://github.com/vishnuvardhanamgogames-byte",
+    "x": "https://x.com/yourhandle",
+    "artstation": "https://artstation.com/yourhandle"
   },
   "projects": [
     {
@@ -317,6 +324,20 @@
           "desc": "Vertical 9:16 final deliverable, optimized and formatted for social platform algorithms."
         }
       }
+    }
+  ],
+  "certifications": [
+    {
+      "title": "Adobe Certified Professional - After Effects",
+      "issuer": "Adobe",
+      "year": "2025",
+      "link": "https://adobe.com"
+    },
+    {
+      "title": "DaVinci Resolve Certified Editor",
+      "issuer": "Blackmagic Design",
+      "year": "2024",
+      "link": "https://blackmagicdesign.com"
     }
   ]
 }

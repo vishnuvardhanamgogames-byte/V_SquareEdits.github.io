@@ -1,23 +1,27 @@
 /* ============================================================
-   FRAMEFLOW — ADMIN PANEL
+   FRAMEFLOW — ADMIN PANEL  (Dashboard Redesign)
    admin.css
    ============================================================ */
 
 :root {
-  --color-bg:        #080808;
+  --color-bg:        #080808;   /* matches main site body */
   --color-surface:   #0d0d0d;
   --color-surface2:  #0b0b0b;
-  --color-border:    #1e1e1e;
+  --color-card:      #0f0f0f;
+  --color-border:    #1e1e1e;   /* matches main site borders */
   --color-border2:   #2a2a2a;
-  --color-text:      #F5F5F5;
-  --color-muted:     #A0A0A0;
+  --color-text:      #F5F5F5;   /* matches main site text */
+  --color-muted:     #A0A0A0;   /* matches main site muted */
   --color-faint:     #666;
-  --color-accent:    #FF3B30;
+  --color-accent:    #FF3B30;   /* matches main site red accent */
+  --radius-card:     6px;       /* main site uses sharper corners */
+  --radius-input:    4px;
+  --radius-pill:     99px;
   --font-main:       'Manrope', sans-serif;
+  --nav-h:           0px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { font-size: 16px; -webkit-font-smoothing: antialiased; }
 
 body {
@@ -33,49 +37,88 @@ button { font-family: var(--font-main); cursor: pointer; }
 
 /* ── Shared typography ──────────────────────────────────────── */
 .admin-eyebrow {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.3em;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   color: var(--color-accent);
   text-transform: uppercase;
 }
 
 .admin-heading {
   font-size: clamp(28px, 4vw, 40px);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--color-text);
-  margin-top: 6px;
+  margin-top: 4px;
+}
+
+/* Dashboard main heading uses display font like the main site */
+.dashboard .admin-heading {
+  font-family: 'Bebas Neue', var(--font-main);
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
 
 .admin-label {
   display: block;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  color: var(--color-faint);
-  text-transform: uppercase;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--color-muted);
   margin-bottom: 6px;
+  letter-spacing: 0;
 }
 
+/* ── Input fields — rounded dark style ──────────────────────── */
 .admin-input {
   width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--color-border2);
+  background: #1a1a1a;
+  border: 1px solid var(--color-border2);
+  border-radius: var(--radius-input);
   color: var(--color-text);
   font-family: var(--font-main);
-  font-size: 14px;
-  padding: 12px 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 11px 14px;
   outline: none;
-  transition: border-color 0.25s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  line-height: 1.5;
 }
 
 .admin-input:focus {
   border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.08);
 }
 
-.admin-input::placeholder { color: rgba(245,245,245,0.2); }
+.admin-input::placeholder { color: #3a3a3a; }
+
+textarea.admin-input {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* ── Form layout helpers ────────────────────────────────────── */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .form-grid-2 { grid-template-columns: 1fr; }
+}
+
+.editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
 
 /* ── LOGIN PAGE ─────────────────────────────────────────────── */
 .login-page {
@@ -84,136 +127,310 @@ button { font-family: var(--font-main); cursor: pointer; }
   justify-content: center;
   min-height: 100vh;
   padding: 24px;
+  background: var(--color-bg);
 }
 
 .login-form {
   width: 100%;
   max-width: 400px;
-  border: 1px solid #222;
-  background: var(--color-surface);
-  padding: 40px 36px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 44px 36px 36px;
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-.form-field {
-  display: flex;
-  flex-direction: column;
-  margin-top: 24px;
-}
+.login-form .admin-heading { margin-top: 6px; }
+.mt-8 { margin-top: 28px; }
 
-.mt-8 { margin-top: 36px; }
+.form-field + .form-field { margin-top: 16px; }
 
 .login-error {
   font-size: 12px;
   font-weight: 600;
   color: var(--color-accent);
   min-height: 20px;
-  margin-top: 16px;
+  margin-top: 14px;
   letter-spacing: 0.02em;
 }
 
 .btn-admin-primary {
-  margin-top: 32px;
+  margin-top: 28px;
   width: 100%;
   border: 1px solid var(--color-accent);
   background: transparent;
   color: var(--color-text);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.2em;
   padding: 14px;
+  border-radius: var(--radius-input);
   transition: background 0.3s, color 0.3s;
 }
 
 .btn-admin-primary:hover {
   background: var(--color-accent);
-  color: var(--color-bg);
+  color: #000;
 }
 
 .btn-admin-primary:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .admin-back-link {
-  margin-top: 24px;
+  margin-top: 20px;
   text-align: center;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.3em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   color: var(--color-faint);
   transition: color 0.2s;
 }
-
 .admin-back-link:hover { color: var(--color-text); }
 
-/* ── DASHBOARD ──────────────────────────────────────────────── */
+/* ── DASHBOARD SHELL ────────────────────────────────────────── */
 .dashboard {
   min-height: 100vh;
-  padding: clamp(32px, 5vw, 48px) clamp(20px, 5vw, 64px);
+  padding: clamp(28px, 4vw, 48px) clamp(20px, 5vw, 64px);
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
+/* ── DASHBOARD HEADER ───────────────────────────────────────── */
 .dash-header {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 24px;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
+}
+
+.dash-header-left p:last-of-type {
+  color: var(--color-muted);
+  font-size: 13px;
+  margin-top: 4px;
+  font-weight: 400;
 }
 
 .dash-actions {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
+  padding-top: 6px;
 }
 
-/* Icon-only square button */
+/* Logout button — pill with border */
+.btn-logout {
+  background: transparent;
+  border: 1px solid var(--color-border2);
+  color: var(--color-text);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: var(--radius-pill);
+  transition: border-color 0.2s, background 0.2s;
+  letter-spacing: 0;
+}
+.btn-logout:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ── TAB NAVIGATION ─────────────────────────────────────────── */
+.dash-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.dash-tab-btn {
+  background: transparent;
+  border: 1px solid var(--color-border2);
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 20px;
+  border-radius: var(--radius-pill);
+  transition: all 0.2s;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.dash-tab-btn:hover {
+  border-color: #555;
+  color: var(--color-text);
+}
+
+.dash-tab-btn.active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ── CONTENT CARD (white-bordered panel) ────────────────────── */
+.dash-content-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border2);
+  border-radius: var(--radius-card);
+  padding: clamp(24px, 4vw, 40px);
+  margin-bottom: 24px;
+}
+
+/* Section title inside card */
+.dash-content-card h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 20px;
+  color: var(--color-text);
+}
+
+/* ── SAVE / ACTION BUTTONS ──────────────────────────────────── */
+.btn-pill-save {
+  background: transparent;
+  border: 1px solid var(--color-border2);
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  transition: all 0.25s;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.btn-pill-save:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.btn-pill-save:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Add buttons (+ ADD EXPERIENCE etc.) */
+.btn-pill-add {
+  background: none;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 7px 18px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-pill-add:hover {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* Delete / danger pill */
+.btn-pill-danger {
+  background: none;
+  border: 1px solid #2a1a1a;
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-pill-danger:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+/* Refresh / icon button */
 .btn-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--color-border2);
   background: transparent;
   color: var(--color-muted);
+  border-radius: var(--radius-pill);
   transition: border-color 0.2s, color 0.2s;
+  flex-shrink: 0;
 }
-
 .btn-icon:hover {
   border-color: var(--color-accent);
-  color: var(--color-text);
+  color: var(--color-accent);
 }
 
-/* Icon + text button */
-.btn-icon-text {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 44px;
-  padding: 0 20px;
+/* Reset to GitHub button */
+#resetToDefaultBtn {
+  background: none;
   border: 1px solid var(--color-border2);
-  background: transparent;
   color: var(--color-muted);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+#resetToDefaultBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* GitHub token mini input */
+#editGithubToken {
+  max-width: 260px;
+  font-size: 12px;
+  padding: 8px 14px;
+  height: 36px;
+  border-radius: var(--radius-input);
+  margin-left: auto;
+}
+
+/* ── SECTION DIVIDER ────────────────────────────────────────── */
+.dash-content-card hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 28px 0;
+}
+
+/* ── PROJECT EDITOR CARD ────────────────────────────────────── */
+.project-editor-card {
+  border: 1px solid var(--color-border);
+  background: #0f0f0f;
+  border-radius: var(--radius-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+}
+
+.project-editor-card summary {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.2em;
-  transition: border-color 0.2s, color 0.2s;
-}
-
-.btn-icon-text:hover {
-  border-color: var(--color-accent);
-  color: var(--color-text);
-}
-
-/* New badge count in heading */
-.new-badge {
-  color: var(--color-accent);
+  color: var(--color-faint);
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  user-select: none;
+  padding: 10px 0 0;
 }
 
 /* ── ENQUIRY LIST ───────────────────────────────────────────── */
@@ -223,28 +440,25 @@ button { font-family: var(--font-main); cursor: pointer; }
   gap: 12px;
 }
 
-.empty-state {
-  font-size: 14px;
-  color: var(--color-faint);
-  padding: 40px 0;
-}
-
+.empty-state,
 .loading-state {
   font-size: 14px;
   color: var(--color-faint);
+  padding: 32px 0;
+  text-align: center;
 }
 
 /* ── ENQUIRY CARD ───────────────────────────────────────────── */
 .enquiry-card {
   border: 1px solid var(--color-border);
-  background: var(--color-surface2);
-  padding: 24px;
+  background: #0f0f0f;
+  border-radius: var(--radius-card);
+  padding: 20px 24px;
   transition: border-color 0.2s;
 }
 
 .enquiry-card.unread {
-  border-color: rgba(255, 59, 48, 0.35);
-  background: var(--color-surface);
+  border-color: rgba(255, 59, 48, 0.3);
 }
 
 .card-top {
@@ -252,22 +466,22 @@ button { font-family: var(--font-main); cursor: pointer; }
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
 }
 
 .card-meta-name {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 700;
   color: var(--color-text);
   flex-wrap: wrap;
 }
 
 .unread-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--color-accent);
   flex-shrink: 0;
@@ -275,22 +489,22 @@ button { font-family: var(--font-main); cursor: pointer; }
 
 .card-email {
   font-size: 12px;
-  font-weight: 600;
-  color: var(--color-faint);
+  font-weight: 500;
+  color: var(--color-muted);
 }
 
 .card-sub {
-  margin-top: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.25em;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   color: var(--color-faint);
   text-transform: uppercase;
 }
 
 .card-body {
-  margin-top: 16px;
-  font-size: 14px;
+  margin-top: 14px;
+  font-size: 13.5px;
   line-height: 1.7;
   color: var(--color-muted);
   max-width: 760px;
@@ -302,27 +516,103 @@ button { font-family: var(--font-main); cursor: pointer; }
   flex-shrink: 0;
 }
 
-/* Small action buttons on each card */
 .btn-card {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border: 1px solid var(--color-border2);
   background: transparent;
   color: var(--color-muted);
-  transition: border-color 0.2s, color 0.2s;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+.btn-card:hover { border-color: var(--color-accent); color: var(--color-text); }
+.btn-card.delete:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+/* ── NEW BADGE (unread count) ───────────────────────────────── */
+.new-badge { color: var(--color-accent); }
+
+/* ── DRAG & DROP IMAGE UPLOADER ─────────────────────────────── */
+.img-drop-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px dashed var(--color-border2);
+  background: #111;
+  padding: 20px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  min-height: 90px;
+  text-align: center;
+  border-radius: var(--radius-input);
 }
 
-.btn-card:hover {
+.img-drop-zone:hover,
+.img-drop-zone.drag-over {
   border-color: var(--color-accent);
-  color: var(--color-text);
+  background: rgba(255, 59, 48, 0.03);
 }
 
-.btn-card.delete:hover {
-  color: var(--color-accent);
+.img-drop-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
 }
+
+.img-drop-icon {
+  color: #333;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+.img-drop-zone:hover .img-drop-icon,
+.img-drop-zone.drag-over .img-drop-icon { color: var(--color-accent); }
+
+.img-drop-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-faint);
+  pointer-events: none;
+}
+.img-drop-label span {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.img-drop-preview {
+  display: none;
+  max-width: 100%;
+  max-height: 110px;
+  object-fit: contain;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  margin-top: 4px;
+}
+.img-drop-preview.visible { display: block; }
+
+.img-drop-clear {
+  display: none;
+  background: none;
+  border: 1px solid var(--color-border2);
+  color: var(--color-faint);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 2px;
+}
+.img-drop-clear.visible { display: inline-flex; }
+.img-drop-clear:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
 /* ── TOAST ──────────────────────────────────────────────────── */
 .toast-container {
@@ -337,121 +627,44 @@ button { font-family: var(--font-main); cursor: pointer; }
 }
 
 .toast {
-  background: #1a1a1a;
+  background: #1c1c1c;
   border: 1px solid var(--color-border2);
   color: var(--color-text);
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  padding: 14px 20px;
+  letter-spacing: 0.02em;
+  padding: 13px 18px;
   min-width: 240px;
+  border-radius: 10px;
   pointer-events: auto;
   animation: toastIn 0.3s cubic-bezier(0.22,1,0.36,1) both;
 }
-
-.toast.success { border-left: 3px solid #22c55e; }
+.toast.success { border-left: 3px solid var(--color-accent); }
 .toast.error   { border-left: 3px solid var(--color-accent); }
 
 @keyframes toastIn {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── DRAG & DROP IMAGE UPLOADER ─────────────────────────────── */
-.img-drop-zone {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  border: 1.5px dashed #2a2a2a;
-  background: #0b0b0b;
-  padding: 20px 16px;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  min-height: 100px;
-  text-align: center;
-}
-
-.img-drop-zone:hover,
-.img-drop-zone.drag-over {
-  border-color: var(--color-accent);
+/* ── PUBLISH STATUS ALERT ───────────────────────────────────── */
+#publishStatusAlert {
   background: rgba(255, 59, 48, 0.04);
-}
-
-.img-drop-zone input[type="file"] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-}
-
-.img-drop-icon {
-  color: #444;
-  flex-shrink: 0;
-  transition: color 0.2s;
-}
-
-.img-drop-zone:hover .img-drop-icon,
-.img-drop-zone.drag-over .img-drop-icon {
-  color: var(--color-accent);
-}
-
-.img-drop-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: #555;
-  pointer-events: none;
-}
-
-.img-drop-label span {
-  color: var(--color-text);
-  font-weight: 700;
-}
-
-.img-drop-preview {
-  display: none;
-  width: 100%;
-  max-height: 120px;
-  object-fit: cover;
-  border: 1px solid #1e1e1e;
-  margin-top: 6px;
-}
-
-.img-drop-preview.visible {
-  display: block;
-}
-
-.img-drop-clear {
-  display: none;
-  background: none;
-  border: 1px solid #333;
-  color: #666;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  padding: 4px 10px;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 4px;
-}
-
-.img-drop-clear.visible {
-  display: inline-flex;
-}
-
-.img-drop-clear:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  border: 1px solid rgba(255, 59, 48, 0.2);
+  border-left: 3px solid var(--color-accent);
+  padding: 16px 20px;
+  font-size: 12.5px;
+  color: var(--color-muted);
+  border-radius: 8px;
+  margin-bottom: 24px;
 }
 
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
-@media (max-width: 540px) {
-  .login-form { padding: 32px 24px; }
+@media (max-width: 600px) {
+  .login-form { padding: 32px 20px; }
   .card-top   { flex-direction: column; }
   .card-btns  { align-self: flex-end; }
+  .dash-header { flex-direction: column; gap: 12px; }
+  .dash-content-card { padding: 20px; }
+  #editGithubToken { margin-left: 0; }
 }

@@ -42,7 +42,8 @@ let portfolioData = null; // Hold dynamic site configuration
 // Fallback defaults for Admin CMS
 const DEFAULT_PORTFOLIO_DATA = {
   "nav": {
-    "logoText": "ALEX MERCER"
+    "logoText": "ALEX MERCER",
+    "logoImage": ""
   },
   "hero": {
     "eyebrow": "VIDEO EDITOR — MOTION • STORY • IMPACT",
@@ -54,6 +55,9 @@ const DEFAULT_PORTFOLIO_DATA = {
   },
   "marquee": ["EDIT", "DESIGN", "STORYTELL", "COLOR", "SOUND", "MOTION"],
   "about": {
+    "name": "ALEX MERCER",
+    "availability": "Available for work",
+    "cv": "",
     "headingLines": ["BEHIND", "THE EDIT"],
     "portraitCaption": "ALEX MERCER — VIDEO EDITOR & MOTION DESIGNER",
     "portraitImage": "public/images/profile/profile.jpg",
@@ -132,7 +136,10 @@ const DEFAULT_PORTFOLIO_DATA = {
     "instagram": "https://instagram.com/yourhandle",
     "youtube": "https://youtube.com/@yourhandle",
     "linkedin": "https://linkedin.com/in/yourhandle",
-    "vimeo": "https://vimeo.com/yourhandle"
+    "vimeo": "https://vimeo.com/yourhandle",
+    "github": "https://github.com/vishnuvardhanamgogames-byte",
+    "x": "https://x.com/yourhandle",
+    "artstation": "https://artstation.com/yourhandle"
   },
   "projects": [
     {
@@ -171,6 +178,20 @@ const DEFAULT_PORTFOLIO_DATA = {
           "desc": "The fully mastered 4K export, completed with theater-ready audio mixing and grading."
         }
       }
+    }
+  ],
+  "certifications": [
+    {
+      "title": "Adobe Certified Professional - After Effects",
+      "issuer": "Adobe",
+      "year": "2025",
+      "link": "https://adobe.com"
+    },
+    {
+      "title": "DaVinci Resolve Certified Editor",
+      "issuer": "Blackmagic Design",
+      "year": "2024",
+      "link": "https://blackmagicdesign.com"
     }
   ]
 };
@@ -256,48 +277,41 @@ function showDashboard() {
   $('loginPage').style.display = 'none';
   $('dashboard').style.display = 'block';
   
-  // Refresh tabs on login
-  switchTab('enquiries');
+  // Default to profile tab on login
+  switchTab('profile');
 }
 
 function switchTab(tabId) {
-  const enquiriesBtn = $('tabEnquiriesBtn');
-  const editWebsiteBtn = $('tabEditWebsiteBtn');
-  const enquiriesContent = $('enquiriesTabContent');
-  const editWebsiteContent = $('editWebsiteTabContent');
+  // Update tab buttons
+  const allBtns = document.querySelectorAll('.dash-tab-btn');
+  allBtns.forEach(btn => {
+    if (btn.dataset.tab === tabId) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
 
+  // Update panes
+  const allPanes = document.querySelectorAll('.tab-pane');
+  allPanes.forEach(pane => {
+    pane.style.display = pane.id === `pane-${tabId}` ? 'block' : 'none';
+  });
+
+  // Load enquiries when that tab is opened
   if (tabId === 'enquiries') {
-    enquiriesBtn.style.color = '#FFF';
-    enquiriesBtn.style.borderBottomColor = 'var(--color-accent)';
-    editWebsiteBtn.style.color = '#666';
-    editWebsiteBtn.style.borderBottomColor = 'transparent';
-
-    enquiriesContent.style.display = 'block';
-    editWebsiteContent.style.display = 'none';
-    
     updateHeading();
-  } else {
-    editWebsiteBtn.style.color = '#FFF';
-    editWebsiteBtn.style.borderBottomColor = 'var(--color-accent)';
-    enquiriesBtn.style.color = '#666';
-    enquiriesBtn.style.borderBottomColor = 'transparent';
-
-    enquiriesContent.style.display = 'none';
-    editWebsiteContent.style.display = 'block';
-    
-    $('dashTitle').textContent = 'EDIT WEBSITE CONTENT';
   }
 }
 
 function updateHeading() {
-  if ($('editWebsiteTabContent').style.display === 'block') {
-    $('dashTitle').textContent = 'EDIT WEBSITE CONTENT';
-    return;
-  }
   const unread = enquiries ? enquiries.filter((e) => !e.read).length : 0;
-  $('dashTitle').innerHTML = unread > 0
-    ? `PROJECT ENQUIRIES <span class="new-badge">(${unread} NEW)</span>`
-    : 'PROJECT ENQUIRIES';
+  const heading = document.getElementById('dashTitle');
+  if (heading) {
+    heading.innerHTML = unread > 0
+      ? `Admin Dashboard <span class="new-badge">(${unread} NEW)</span>`
+      : 'Admin Dashboard';
+  }
 }
 
 /* ============================================================
@@ -454,36 +468,89 @@ function populateEditorForm() {
   if (!portfolioData) return;
 
   // GitHub token
-  $('editGithubToken').value = localStorage.getItem('ff_gh_token') || '';
+  const ghEl = $('editGithubToken');
+  if (ghEl) ghEl.value = localStorage.getItem('ff_gh_token') || '';
 
-  // General & Nav
-  $('editLogoText').value = portfolioData.nav ? portfolioData.nav.logoText : '';
-  $('editContactEmail').value = portfolioData.contact ? portfolioData.contact.email : '';
-  $('editInstagram').value = portfolioData.contact ? portfolioData.contact.instagram : '';
-  $('editYouTube').value = portfolioData.contact ? portfolioData.contact.youtube : '';
-  $('editLinkedIn').value = portfolioData.contact ? portfolioData.contact.linkedin : '';
-  $('editVimeo').value = portfolioData.contact ? portfolioData.contact.vimeo : '';
+  // Profile tab — Name (mapped from nav.logoText)
+  const nameEl = $('editName');
+  if (nameEl) nameEl.value = portfolioData.nav ? portfolioData.nav.logoText : '';
+
+  // Contact
+  const emailEl = $('editContactEmail');
+  if (emailEl) emailEl.value = portfolioData.contact ? portfolioData.contact.email : '';
+
+  const igEl = $('editInstagram');
+  if (igEl) igEl.value = portfolioData.contact ? (portfolioData.contact.instagram || '') : '';
+
+  const ytEl = $('editYouTube');
+  if (ytEl) ytEl.value = portfolioData.contact ? (portfolioData.contact.youtube || '') : '';
+
+  const liEl = $('editLinkedIn');
+  if (liEl) liEl.value = portfolioData.contact ? (portfolioData.contact.linkedin || '') : '';
+
+  const vimeoEl = $('editVimeo');
+  if (vimeoEl) vimeoEl.value = portfolioData.contact ? (portfolioData.contact.vimeo || '') : '';
+
+  const ghSocialEl = $('editGitHub');
+  if (ghSocialEl) ghSocialEl.value = portfolioData.contact ? (portfolioData.contact.github || '') : '';
+
+  const xEl = $('editX');
+  if (xEl) xEl.value = portfolioData.contact ? (portfolioData.contact.x || '') : '';
+
+  const artEl = $('editArtStation');
+  if (artEl) artEl.value = portfolioData.contact ? (portfolioData.contact.artstation || '') : '';
+
+  // Availability
+  const availEl = $('editAvailability');
+  if (availEl) availEl.value = portfolioData.hero ? (portfolioData.hero.availability || '') : '';
 
   // Hero
-  $('editHeroEyebrow').value = portfolioData.hero ? portfolioData.hero.eyebrow : '';
-  $('editHeroHeadline').value = portfolioData.hero ? portfolioData.hero.headlineLines.join(', ') : '';
-  $('editHeroSubtext').value = portfolioData.hero ? portfolioData.hero.subtext : '';
-  $('editHeroBgImage').value = portfolioData.hero ? (portfolioData.hero.showreelPoster || '') : '';
-  $('editHeroShowreel').value = portfolioData.hero ? portfolioData.hero.showreelVideo : '';
-  $('editShowreelDuration').value = portfolioData.hero ? portfolioData.hero.showreelDuration : '01:00';
+  const eyebrowEl = $('editHeroEyebrow');
+  if (eyebrowEl) eyebrowEl.value = portfolioData.hero ? portfolioData.hero.eyebrow : '';
 
-  // About
-  $('editAboutHeading').value = portfolioData.about ? portfolioData.about.headingLines.join(', ') : '';
-  $('editPortraitCaption').value = portfolioData.about ? portfolioData.about.portraitCaption : '';
-  $('editAboutPortraitImage').value = portfolioData.about ? (portfolioData.about.portraitImage || '') : '';
-  $('editBioParagraph1').value = portfolioData.about ? portfolioData.about.bioParagraph1 : '';
-  $('editBioParagraph2').value = portfolioData.about ? portfolioData.about.bioParagraph2 : '';
-  $('editAboutLocation').value = portfolioData.about ? portfolioData.about.location : '';
-  $('editAboutExperience').value = portfolioData.about ? portfolioData.about.experience : '';
-  $('editAboutSpecialties').value = portfolioData.about ? portfolioData.about.specialties : '';
+  const subtextEl = $('editHeroSubtext');
+  if (subtextEl) subtextEl.value = portfolioData.hero ? portfolioData.hero.subtext : '';
 
-  // Render project editors list
+  const heroBgEl = $('editHeroBgImage');
+  if (heroBgEl) heroBgEl.value = portfolioData.hero ? (portfolioData.hero.showreelPoster || '') : '';
+
+  const showreelEl = $('editHeroShowreel');
+  if (showreelEl) showreelEl.value = portfolioData.hero ? portfolioData.hero.showreelVideo : '';
+
+  const durationEl = $('editShowreelDuration');
+  if (durationEl) durationEl.value = portfolioData.hero ? portfolioData.hero.showreelDuration : '01:00';
+
+  // Portrait image
+  const portraitImgEl = $('editAboutPortraitImage');
+  if (portraitImgEl) portraitImgEl.value = portfolioData.about ? (portfolioData.about.portraitImage || '') : '';
+
+  // About tab
+  const aboutHeadEl = $('editAboutHeading');
+  if (aboutHeadEl) aboutHeadEl.value = portfolioData.about ? portfolioData.about.headingLines.join(', ') : '';
+
+  const captionEl = $('editPortraitCaption');
+  if (captionEl) captionEl.value = portfolioData.about ? portfolioData.about.portraitCaption : '';
+
+  const bio1El = $('editBioParagraph1');
+  if (bio1El) bio1El.value = portfolioData.about ? portfolioData.about.bioParagraph1 : '';
+
+  const bio2El = $('editBioParagraph2');
+  if (bio2El) bio2El.value = portfolioData.about ? portfolioData.about.bioParagraph2 : '';
+
+  const locEl = $('editAboutLocation');
+  if (locEl) locEl.value = portfolioData.about ? portfolioData.about.location : '';
+
+  const expEl = $('editAboutExperience');
+  if (expEl) expEl.value = portfolioData.about ? portfolioData.about.experience : '';
+
+  const specEl = $('editAboutSpecialties');
+  if (specEl) specEl.value = portfolioData.about ? portfolioData.about.specialties : '';
+
+  // Render dynamic lists
   renderProjectEditors(portfolioData.projects || []);
+  renderExperienceEditors(portfolioData.experienceTimeline || []);
+  renderServicesEditors(portfolioData.services || []);
+  renderToolkitEditor(portfolioData.toolkit || {});
 }
 
 function renderProjectEditors(projects) {
@@ -498,7 +565,6 @@ function renderProjectEditors(projects) {
   projects.forEach((p, idx) => {
     const card = document.createElement('div');
     card.className = 'project-editor-card';
-    card.style.cssText = 'border: 1px solid #1e1e1e; background: #0b0b0b; padding: 24px; display: flex; flex-direction: column; gap: 16px; position: relative;';
 
     // Safely get breakdown details with raw fallbacks
     const rawBreakdown = p.breakdown || {};
@@ -528,56 +594,58 @@ function renderProjectEditors(projects) {
     }).join('\n');
 
     card.innerHTML = `
-      <button type="button" class="btn-delete-project" data-idx="${idx}" style="position: absolute; top: 16px; right: 16px; background: none; border: 1px solid var(--color-accent); color: var(--color-accent); font-weight: bold; font-size: 9px; padding: 4px 8px; letter-spacing:0.05em; cursor: pointer; transition: all 0.2s;">DELETE PROJECT</button>
-      
-      <h4 class="admin-eyebrow" style="color: #666; font-size:11px;">PROJECT #${idx + 1}</h4>
-      
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-        <div class="form-field" style="margin-top: 0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <span class="admin-eyebrow" style="font-size:10px; letter-spacing:0.1em; color:var(--color-accent);">PROJECT #${idx + 1}</span>
+        <button type="button" class="btn-pill-danger btn-delete-project" data-idx="${idx}">DELETE</button>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-field">
           <label class="admin-label">Title</label>
-          <input type="text" class="admin-input p-title" required value="${escHtml(p.title)}" />
+          <input type="text" class="admin-input p-title" value="${escHtml(p.title)}" />
         </div>
-        <div class="form-field" style="margin-top: 0;">
+        <div class="form-field">
           <label class="admin-label">Category</label>
-          <input type="text" class="admin-input p-category" required value="${escHtml(p.category)}" />
+          <input type="text" class="admin-input p-category" value="${escHtml(p.category)}" />
         </div>
-        <div class="form-field" style="margin-top: 0;">
+        <div class="form-field">
           <label class="admin-label">Role</label>
-          <input type="text" class="admin-input p-role" required value="${escHtml(p.role)}" />
+          <input type="text" class="admin-input p-role" value="${escHtml(p.role)}" />
         </div>
-        <div class="form-field" style="margin-top: 0;">
+        <div class="form-field">
           <label class="admin-label">Software (comma separated)</label>
-          <input type="text" class="admin-input p-software" required value="${escHtml(p.software)}" />
+          <input type="text" class="admin-input p-software" value="${escHtml(p.software)}" />
         </div>
-        <div class="form-field" style="margin-top: 0;">
+        <div class="form-field">
           <label class="admin-label">Year</label>
-          <input type="text" class="admin-input p-year" required value="${escHtml(p.year)}" />
+          <input type="text" class="admin-input p-year" value="${escHtml(p.year)}" />
         </div>
-        <div class="form-field" style="margin-top: 0;">
-          <label class="admin-label">Video URL (direct MP4 link)</label>
-          <input type="url" class="admin-input p-video" required value="${escHtml(p.video)}" />
-        </div>
-        <div class="form-field" style="margin-top: 0;">
-          <label class="admin-label">Poster / Thumbnail Image</label>
-          <div class="img-drop-zone" data-target="p-image" role="button" tabindex="0" aria-label="Upload project thumbnail">
-            <input type="file" accept="image/*" aria-label="Choose project thumbnail file" />
-            <svg class="img-drop-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <p class="img-drop-label"><span>Choose a file</span> or drag it here</p>
-            ${p.image ? `<img class="img-drop-preview visible" src="${escHtml(p.image)}" alt="Project thumbnail preview" />` : `<img class="img-drop-preview" alt="Project thumbnail preview" />`}
-            <button type="button" class="img-drop-clear${p.image ? ' visible' : ''}">✕ REMOVE</button>
-          </div>
-          <input type="hidden" class="p-image" value="${escHtml(p.image || '')}" />
+        <div class="form-field">
+          <label class="admin-label">Video URL (MP4 / stream)</label>
+          <input type="url" class="admin-input p-video" value="${escHtml(p.video)}" />
         </div>
       </div>
-      
-      <div class="form-field" style="margin-top: 0;">
+
+      <div class="form-field">
+        <label class="admin-label">Poster / Thumbnail Image</label>
+        <div class="img-drop-zone" data-target="p-image" role="button" tabindex="0" aria-label="Upload project thumbnail">
+          <input type="file" accept="image/*" aria-label="Choose project thumbnail file" />
+          <svg class="img-drop-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p class="img-drop-label"><span>Choose a file</span> or drag it here</p>
+          ${p.image ? `<img class="img-drop-preview visible" src="${escHtml(p.image)}" alt="Project thumbnail preview" />` : `<img class="img-drop-preview" alt="Project thumbnail preview" />`}
+          <button type="button" class="img-drop-clear${p.image ? ' visible' : ''}">✕ REMOVE</button>
+        </div>
+        <input type="hidden" class="p-image" value="${escHtml(p.image || '')}" />
+      </div>
+
+      <div class="form-field">
         <label class="admin-label">Description</label>
-        <textarea class="admin-input p-description" style="border: 1px solid var(--color-border2); padding: 8px; background: transparent; min-height: 80px;" required>${escHtml(p.description)}</textarea>
+        <textarea class="admin-input p-description" style="min-height:80px;">${escHtml(p.description)}</textarea>
       </div>
-      
-      <details style="border-top: 1px solid #1c1c1c; padding-top: 12px; margin-top: 4px;">
-        <summary style="font-size: 10px; font-weight: 700; color: #555; letter-spacing: 0.1em; cursor: pointer; user-select: none;">EDIT 6-STAGE VIDEO BREAKDOWN</summary>
-        <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 12px;">
+
+      <details style="border-top:1px solid var(--color-border); padding-top:14px; margin-top:4px;">
+        <summary>▸ EDIT 6-STAGE VIDEO BREAKDOWN</summary>
+        <div style="display:flex; flex-direction:column; gap:16px; margin-top:14px;">
           ${stagesHtml}
         </div>
       </details>
@@ -588,79 +656,329 @@ function renderProjectEditors(projects) {
   });
 }
 
+/* ── Experience Editor ────────────────────────────────────── */
+function renderExperienceEditors(timeline) {
+  const container = $('experienceEditorList');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (!timeline.length) {
+    container.innerHTML = '<p style="font-size:12px; color:#555;">No experience entries yet.</p>';
+    return;
+  }
+
+  timeline.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'project-editor-card';
+    card.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <span style="font-size:10px; font-weight:700; color:var(--color-accent); letter-spacing:0.08em;">ENTRY #${idx + 1}</span>
+        <button type="button" class="btn-pill-danger btn-delete-experience" data-idx="${idx}">DELETE</button>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label class="admin-label">Year</label>
+          <input type="text" class="admin-input exp-year" value="${escHtml(item.year || '')}" placeholder="2026" />
+        </div>
+        <div class="form-field">
+          <label class="admin-label">Role</label>
+          <input type="text" class="admin-input exp-role" value="${escHtml(item.role || '')}" placeholder="VIDEO EDITOR" />
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="admin-label">Place / Company</label>
+        <input type="text" class="admin-input exp-place" value="${escHtml(item.place || '')}" placeholder="FREELANCE" />
+      </div>
+      <div class="form-field">
+        <label class="admin-label">Description</label>
+        <textarea class="admin-input exp-desc" style="min-height: 70px;">${escHtml(item.desc || '')}</textarea>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+/* ── Services Editor ─────────────────────────────────────── */
+function renderServicesEditors(services) {
+  const container = $('servicesEditorList');
+  if (!container) return;
+  container.innerHTML = '';
+
+  services.forEach((s, idx) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'border-bottom: 1px solid #1e1e1e; padding-bottom: 16px; display: flex; flex-direction: column; gap: 10px;';
+    div.innerHTML = `
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label class="admin-label">Service Title</label>
+          <input type="text" class="admin-input svc-title" value="${escHtml(s.title || '')}" />
+        </div>
+        <div class="form-field">
+          <label class="admin-label">Items (comma separated)</label>
+          <input type="text" class="admin-input svc-items" value="${escHtml((s.items || []).join(', '))}" />
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+/* ── Toolkit Editor ──────────────────────────────────────── */
+function renderToolkitEditor(toolkit) {
+  const container = $('toolkitEditorGrid');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const cats = [
+    { key: 'editing', label: 'Editing' },
+    { key: 'motion',  label: 'Motion' },
+    { key: 'design',  label: 'Design' },
+    { key: 'threeD',  label: '3D' },
+    { key: 'audio',   label: 'Audio' },
+  ];
+
+  cats.forEach(cat => {
+    const val = (toolkit[cat.key] || []).join(', ');
+    const div = document.createElement('div');
+    div.className = 'form-field';
+    div.innerHTML = `
+      <label class="admin-label">${cat.label} Tools (comma separated)</label>
+      <input type="text" class="admin-input toolkit-${cat.key}" value="${escHtml(val)}" placeholder="e.g. Premiere Pro, DaVinci Resolve" />
+    `;
+    container.appendChild(div);
+  });
+}
+
+
+/* ============================================================
+   STORAGE HELPERS
+   ============================================================ */
+
+/**
+ * Returns a deep copy of data with base64 data URLs replaced by empty strings.
+ * This keeps localStorage usage small while the full data (with images) lives in memory.
+ */
+function stripBase64ForStorage(data) {
+  const json = JSON.stringify(data);
+  // Replace all base64 data URLs (data:image/...;base64,...) with a placeholder
+  const stripped = json.replace(/"data:[^"]{0,20};base64,[^"]+"/g, '""');
+  try {
+    return JSON.parse(stripped);
+  } catch {
+    return data; // fallback — return original if parsing fails
+  }
+}
+
+/**
+ * FILE SYSTEM ACCESS API
+ * Lets the user pick data.json once — after that every save writes
+ * directly to that file on disk. No manual copy/replace needed.
+ *
+ * fileHandle is stored in memory (survives the session).
+ * On next login the user is prompted once to re-pick the file.
+ */
+let _fileHandle = null; // persists for the lifetime of the tab
+
+/**
+ * Ask the user to pick data.json from their project folder.
+ * Called automatically on first save if no handle is stored yet.
+ */
+async function pickDataJsonFile() {
+  if (!('showSaveFilePicker' in window)) return null; // API not supported
+  try {
+    const handle = await window.showSaveFilePicker({
+      suggestedName: 'data.json',
+      types: [{ description: 'JSON file', accept: { 'application/json': ['.json'] } }],
+      startIn: 'desktop',
+    });
+    _fileHandle = handle;
+    return handle;
+  } catch (e) {
+    // User cancelled — that's fine
+    return null;
+  }
+}
+
+/**
+ * Write data directly to data.json on disk using the stored file handle.
+ * Falls back to download if the API isn't supported or user never picked a file.
+ */
+async function writeDataJsonToDisk(data) {
+  const json = JSON.stringify(data, null, 2);
+
+  // Try File System Access API first (Chrome/Edge on desktop)
+  if ('showSaveFilePicker' in window) {
+    // First save: ask user to pick/confirm the file location once
+    if (!_fileHandle) {
+      toast('📂 Pick your data.json file to enable auto-save…');
+      _fileHandle = await pickDataJsonFile();
+    }
+
+    if (_fileHandle) {
+      try {
+        const writable = await _fileHandle.createWritable();
+        await writable.write(json);
+        await writable.close();
+        toast('✓ data.json updated on disk automatically!');
+        return;
+      } catch (e) {
+        // Permission may have expired — re-prompt next time
+        _fileHandle = null;
+        toast('Auto-save permission lost. Re-save to re-connect the file.', 'error');
+      }
+    }
+  }
+
+  // Fallback: download the file (Firefox, or if user cancelled the picker)
+  try {
+    const blob = new Blob([json], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'data.json';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+    toast('✓ data.json downloaded — replace the file in your Web02 folder.');
+  } catch (_) { /* ignore */ }
+}
+
+/**
+ * Compress an image File to a JPEG data URL at reduced quality/size.
+ * Used before storing images so drag-and-drop uploads stay manageable.
+ */
+function compressImage(file, maxWidth = 800, quality = 0.72) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        canvas.width  = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 async function saveLocalPreview() {
   const form = $('websiteEditorForm');
-  if (!form.checkValidity()) {
+  if (form && !form.checkValidity()) {
     form.reportValidity();
     return;
   }
 
   // Save token to localstorage
-  const ghToken = $('editGithubToken').value.trim();
-  localStorage.setItem('ff_gh_token', ghToken);
+  const ghToken = $('editGithubToken') ? $('editGithubToken').value.trim() : '';
+  if (ghToken) localStorage.setItem('ff_gh_token', ghToken);
 
-  // Construct new portfolio data object
+  // Helper to safely get input value
+  const val = (id) => { const el = $(id); return el ? el.value.trim() : ''; };
+
+  // Serialize services
+  const svcCards = document.querySelectorAll('#servicesEditorList > div');
+  const services = Array.from(svcCards).map((card, idx) => ({
+    num: String(idx + 1).padStart(2, '0'),
+    title: card.querySelector('.svc-title') ? card.querySelector('.svc-title').value.trim() : '',
+    items: card.querySelector('.svc-items') ? card.querySelector('.svc-items').value.split(',').map(s => s.trim()).filter(Boolean) : []
+  }));
+
+  // Serialize toolkit
+  const toolkit = {};
+  ['editing','motion','design','threeD','audio'].forEach(k => {
+    const el = document.querySelector(`.toolkit-${k}`);
+    toolkit[k] = el ? el.value.split(',').map(s => s.trim()).filter(Boolean) : (portfolioData.toolkit ? portfolioData.toolkit[k] || [] : []);
+  });
+
+  // Serialize experience
+  const expCards = document.querySelectorAll('#experienceEditorList .project-editor-card');
+  const experienceTimeline = Array.from(expCards).map(card => ({
+    year:  card.querySelector('.exp-year')  ? card.querySelector('.exp-year').value.trim()  : '',
+    role:  card.querySelector('.exp-role')  ? card.querySelector('.exp-role').value.trim()  : '',
+    place: card.querySelector('.exp-place') ? card.querySelector('.exp-place').value.trim() : '',
+    desc:  card.querySelector('.exp-desc')  ? card.querySelector('.exp-desc').value.trim()  : '',
+  }));
+
+  // Construct updated data object
   const updatedData = {
     nav: {
-      logoText: $('editLogoText').value.trim()
+      logoText: val('editName') || (portfolioData.nav ? portfolioData.nav.logoText : '')
     },
     hero: {
-      eyebrow: $('editHeroEyebrow').value.trim(),
-      headlineLines: $('editHeroHeadline').value.split(',').map(s => s.trim()).filter(Boolean),
-      subtext: $('editHeroSubtext').value.trim(),
-      showreelVideo: $('editHeroShowreel').value.trim(),
-      showreelPoster: $('editHeroBgImage').value.trim() || (portfolioData.hero ? portfolioData.hero.showreelPoster : "public/images/projects/hero_workspace.jpg"),
-      showreelDuration: $('editShowreelDuration').value.trim()
+      eyebrow: val('editHeroEyebrow'),
+      headlineLines: portfolioData.hero ? portfolioData.hero.headlineLines : ['CUTTING', 'STORIES INTO', 'MOTION.'],
+      subtext: val('editHeroSubtext'),
+      availability: val('editAvailability'),
+      showreelVideo: val('editHeroShowreel'),
+      showreelPoster: val('editHeroBgImage') || (portfolioData.hero ? portfolioData.hero.showreelPoster : ''),
+      showreelDuration: val('editShowreelDuration') || '01:00'
     },
-    marquee: portfolioData.marquee || ["EDIT", "DESIGN", "STORYTELL", "COLOR", "SOUND", "MOTION"],
+    marquee: portfolioData.marquee || ['EDIT', 'DESIGN', 'STORYTELL', 'COLOR', 'SOUND', 'MOTION'],
     about: {
-      headingLines: $('editAboutHeading').value.split(',').map(s => s.trim()).filter(Boolean),
-      portraitCaption: $('editPortraitCaption').value.trim(),
-      portraitImage: $('editAboutPortraitImage').value.trim() || (portfolioData.about ? portfolioData.about.portraitImage : "public/images/profile/profile.jpg"),
-      bioParagraph1: $('editBioParagraph1').value.trim(),
-      bioParagraph2: $('editBioParagraph2').value.trim(),
-      location: $('editAboutLocation').value.trim(),
-      experience: $('editAboutExperience').value.trim(),
-      specialties: $('editAboutSpecialties').value.trim()
+      headingLines: val('editAboutHeading').split(',').map(s => s.trim()).filter(Boolean),
+      portraitCaption: val('editPortraitCaption'),
+      portraitImage: val('editAboutPortraitImage') || (portfolioData.about ? portfolioData.about.portraitImage : ''),
+      bioParagraph1: val('editBioParagraph1'),
+      bioParagraph2: val('editBioParagraph2'),
+      location: val('editAboutLocation'),
+      experience: val('editAboutExperience'),
+      specialties: val('editAboutSpecialties')
     },
-    services: portfolioData.services || [],
-    toolkit: portfolioData.toolkit || {},
+    services: services.length ? services : (portfolioData.services || []),
+    toolkit,
     process: portfolioData.process || [],
-    experienceTimeline: portfolioData.experienceTimeline || [],
+    experienceTimeline: experienceTimeline.length ? experienceTimeline : (portfolioData.experienceTimeline || []),
     contact: {
-      email: $('editContactEmail').value.trim(),
-      instagram: $('editInstagram').value.trim(),
-      youtube: $('editYouTube').value.trim(),
-      linkedin: $('editLinkedIn').value.trim(),
-      vimeo: $('editVimeo').value.trim()
+      email:      val('editContactEmail'),
+      instagram:  val('editInstagram'),
+      youtube:    val('editYouTube'),
+      linkedin:   val('editLinkedIn'),
+      vimeo:      val('editVimeo'),
+      github:     val('editGitHub'),
+      x:          val('editX'),
+      artstation: val('editArtStation')
     },
     projects: serializeProjects()
   };
 
   try {
-    localStorage.setItem('portfolio_data', JSON.stringify(updatedData));
-    portfolioData = updatedData;
-    toast('Preview updated locally!');
+    // Strip large base64 data URLs before saving to localStorage to avoid QuotaExceededError.
+    // Images uploaded via drag-and-drop are kept in memory (portfolioData) for live preview
+    // but only URLs/paths (not raw base64) are persisted.
+    const storableData = stripBase64ForStorage(updatedData);
+    localStorage.setItem('portfolio_data', JSON.stringify(storableData));
+    portfolioData = updatedData; // keep full data (incl. base64) in memory
+    // Write data.json directly to disk (File System Access API) or download as fallback
+    writeDataJsonToDisk(storableData);
   } catch (e) {
-    toast('Failed to save preview locally.', 'error');
+    // If still too large even after stripping (shouldn't happen), just keep in memory
+    portfolioData = updatedData;
+    toast('Saved in session. Data too large for browser storage — use GitHub publish to persist.', 'error');
   }
 
   // Trigger GitHub commit if token is configured
   if (ghToken) {
     await publishToGithub(updatedData, ghToken);
   } else {
-    toast('Preview saved! Paste a GitHub Token in General Settings to publish live automatically.', 'error');
+    toast('Saved locally. Add a GitHub Token to publish live.', 'error');
   }
 }
 
+
 async function publishToGithub(updatedData, token) {
-  const publishBtn = $('saveAndPublishBtn');
-  const originalText = publishBtn.textContent;
   const statusAlert = $('publishStatusAlert');
-  
-  publishBtn.textContent = 'PUBLISHING TO GITHUB...';
-  publishBtn.disabled = true;
-  statusAlert.style.display = 'none';
+  if (statusAlert) { statusAlert.style.display = 'none'; }
 
   try {
     const owner = 'vishnuvardhanamgogames-byte';
@@ -718,37 +1036,50 @@ async function publishToGithub(updatedData, token) {
     console.error(err);
     toast(err.message || 'Failed to publish to GitHub.', 'error');
   } finally {
-    publishBtn.textContent = originalText;
-    publishBtn.disabled = false;
+    // no button state to restore in new UI
   }
 }
 
 function serializeProjects() {
-  const cards = $$('.project-editor-card');
+  // Only grab project cards inside #projectsEditorList to avoid grabbing experience cards
+  const cards = $$('#projectsEditorList .project-editor-card');
   return cards.map((card, idx) => {
     const stages = ['raw', 'edit', 'color', 'motion', 'sound', 'final'];
     const breakdown = {};
     stages.forEach(s => {
+      const imgEl = card.querySelector(`.stage-${s}-image`);
+      const descEl = card.querySelector(`.stage-${s}-desc`);
       breakdown[s.toUpperCase()] = {
-        image: card.querySelector(`.stage-${s}-image`).value.trim(),
-        desc: card.querySelector(`.stage-${s}-desc`).value.trim()
+        image: imgEl ? imgEl.value.trim() : '',
+        desc:  descEl ? descEl.value.trim() : ''
       };
     });
 
     return {
       index: String(idx + 1).padStart(2, '0'),
-      title: card.querySelector('.p-title').value.trim(),
-      category: card.querySelector('.p-category').value.trim(),
-      role: card.querySelector('.p-role').value.trim(),
-      software: card.querySelector('.p-software').value.trim(),
-      year: card.querySelector('.p-year').value.trim(),
-      video: card.querySelector('.p-video').value.trim(),
-      image: card.querySelector('.p-image').value.trim(),
-      description: card.querySelector('.p-description').value.trim(),
+      title:       card.querySelector('.p-title')       ? card.querySelector('.p-title').value.trim()       : '',
+      category:    card.querySelector('.p-category')    ? card.querySelector('.p-category').value.trim()    : '',
+      role:        card.querySelector('.p-role')        ? card.querySelector('.p-role').value.trim()        : '',
+      software:    card.querySelector('.p-software')    ? card.querySelector('.p-software').value.trim()    : '',
+      year:        card.querySelector('.p-year')        ? card.querySelector('.p-year').value.trim()        : '',
+      video:       card.querySelector('.p-video')       ? card.querySelector('.p-video').value.trim()       : '',
+      image:       card.querySelector('.p-image')       ? card.querySelector('.p-image').value.trim()       : '',
+      description: card.querySelector('.p-description') ? card.querySelector('.p-description').value.trim() : '',
       breakdown
     };
   });
 }
+
+function serializeExperience() {
+  const cards = $$('#experienceEditorList .project-editor-card');
+  return cards.map(card => ({
+    year:  card.querySelector('.exp-year')  ? card.querySelector('.exp-year').value.trim()  : '',
+    role:  card.querySelector('.exp-role')  ? card.querySelector('.exp-role').value.trim()  : '',
+    place: card.querySelector('.exp-place') ? card.querySelector('.exp-place').value.trim() : '',
+    desc:  card.querySelector('.exp-desc')  ? card.querySelector('.exp-desc').value.trim()  : '',
+  }));
+}
+
 
 function exportConfigJson() {
   // First, serialize current values
@@ -899,7 +1230,7 @@ function bindDropZone(zone, hiddenInput) {
     fileInput.addEventListener('change', () => {
       const file = fileInput.files[0];
       if (!file) return;
-      readFileAsDataURL(file, applyImage);
+      compressImage(file).then(applyImage);
     });
   }
 
@@ -920,7 +1251,7 @@ function bindDropZone(zone, hiddenInput) {
     zone.classList.remove('drag-over');
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
-      readFileAsDataURL(file, applyImage);
+      compressImage(file).then(applyImage);
     } else {
       toast('Please drop an image file.', 'error');
     }
@@ -998,6 +1329,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Logout ─────────────────────────────────────────────────
   $('logoutBtn').addEventListener('click', logout);
 
+  // ── Connect data.json file for auto-save ──────────────────
+  const connectBtn = $('connectFileBtn');
+  if (connectBtn) {
+    connectBtn.addEventListener('click', async () => {
+      _fileHandle = null; // reset so picker is shown
+      const handle = await pickDataJsonFile();
+      const statusEl = $('connectFileStatus');
+      if (handle && statusEl) {
+        statusEl.textContent = '✓ Connected: ' + handle.name;
+        statusEl.style.color = 'var(--color-accent)';
+        toast('✓ data.json connected! All saves now write directly to your file.');
+      } else if (statusEl) {
+        statusEl.textContent = 'Not connected (saves will download instead)';
+        statusEl.style.color = '#555';
+      }
+    });
+  }
+
   // ── Refresh enquiries ──────────────────────────────────────
   $('refreshBtn').addEventListener('click', () => {
     enquiries = null;
@@ -1017,9 +1366,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btn.dataset.action === 'delete')      deleteEnquiry(id);
   });
 
-  // ── Tabs Switching ─────────────────────────────────────────
-  $('tabEnquiriesBtn').addEventListener('click', () => switchTab('enquiries'));
-  $('tabEditWebsiteBtn').addEventListener('click', () => switchTab('edit'));
+  // ── Tabs Switching (delegated to all .dash-tab-btn) ───────
+  document.querySelectorAll('.dash-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabId = btn.dataset.tab;
+      if (tabId) switchTab(tabId);
+    });
+  });
 
   // ── Add New Project ────────────────────────────────────────
   $('addNewProjectBtn').addEventListener('click', () => {
@@ -1091,6 +1444,34 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     saveLocalPreview();
   });
+
+  // ── Add New Experience ─────────────────────────────────────
+  const addExpBtn = $('addNewExperienceBtn');
+  if (addExpBtn) {
+    addExpBtn.addEventListener('click', () => {
+      const current = serializeExperience();
+      current.push({ year: new Date().getFullYear().toString(), role: 'NEW ROLE', place: 'COMPANY / CLIENT', desc: 'Describe your responsibilities here.' });
+      portfolioData.experienceTimeline = current;
+      renderExperienceEditors(current);
+      toast('New experience entry added.');
+    });
+  }
+
+  // ── Delete Experience (delegated) ─────────────────────────
+  const expList = $('experienceEditorList');
+  if (expList) {
+    expList.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-delete-experience');
+      if (!btn) return;
+      if (confirm('Delete this experience entry?')) {
+        const current = serializeExperience();
+        current.splice(parseInt(btn.dataset.idx, 10), 1);
+        portfolioData.experienceTimeline = current;
+        renderExperienceEditors(current);
+        toast('Experience entry deleted.');
+      }
+    });
+  }
 
   // ── Init ───────────────────────────────────────────────────
   initImageDropZones(); // wire up fixed drop zones (portrait, hero bg)
