@@ -12,7 +12,7 @@
     "subtext": "Video Editor & Motion Designer specializing in cinematic edits, social content, motion graphics and visual storytelling.",
     "availability": "2026",
     "showreelVideo": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    "showreelPoster": "public/images/projects/hero_workspace.jpg",
+    "showreelPoster": "",
     "showreelDuration": "01:00"
   },
   "marquee": [
@@ -182,7 +182,7 @@
       "software": "Premiere Pro, DaVinci Resolve, Audition",
       "year": "2026",
       "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-      "image": "https://images.unsplash.com/photo-1771038396898-50c5bbbbfa67?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHw0fHxzcG9ydHMlMjBjYXIlMjBjb21tZXJjaWFsJTIwY2luZW1hdGljfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85",
+      "image": "",
       "description": "A high-energy trailer cut built around rhythm and restraint — every beat mapped to the music, every transition earned. Graded for a cold, filmic finish with deep blacks and controlled highlights.",
       "breakdown": {
         "RAW": {
@@ -219,7 +219,7 @@
       "software": "Premiere Pro, After Effects",
       "year": "2026",
       "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-      "image": "https://images.unsplash.com/photo-1695192721582-5660bca08424?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MDV8MHwxfHNlYXJjaHwyfHxtdXNpYyUyMHZpZGVvJTIwYWVzdGhldGljfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85",
+      "image": "",
       "description": "A music-driven montage stitched from dozens of sources into one continuous visual flow — match cuts, velocity ramps and seamless masked transitions synced to the track.",
       "breakdown": {
         "RAW": {
@@ -256,7 +256,7 @@
       "software": "After Effects, Premiere Pro, Photoshop",
       "year": "2025",
       "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-      "image": "https://images.unsplash.com/photo-1532170579297-281918c8ae72?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2OTV8MHwxfHNlYXJjaHw0fHxjaW5lbWF0aWMlMjBwb3J0cmFpdCUyMGRhcmslMjBtb29kfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85",
+      "image": "",
       "description": "A punchy 30-second product spot built entirely from animated typography, shape systems and rhythm — designed to land the message with the sound off.",
       "breakdown": {
         "RAW": {
