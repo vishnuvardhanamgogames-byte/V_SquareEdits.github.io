@@ -7,7 +7,11 @@
 
 /* ── Config ──────────────────────────────────────────────────── */
 const API_BASE = (window.FF_API_URL || '').replace(/\/$/, '');
-const USE_LOCAL = !API_BASE; // fallback to localStorage when no API configured
+const USE_LOCAL = !API_BASE;
+
+// Imgur anonymous upload — free, no account needed for public images
+// Client ID from a registered Imgur app (anonymous uploads, read-only key)
+const IMGUR_CLIENT_ID = '546c25a59c58ad7';  // free anonymous client ID
 
 /* ── Utility ─────────────────────────────────────────────────── */
 const $ = (id) => document.getElementById(id);
@@ -745,42 +749,12 @@ function renderToolkitEditor(toolkit) {
 
 /**
  * Returns a deep copy of data with base64 data URLs replaced by empty strings.
- * Base64 images are too large for GitHub API — store URLs only.
+ * Kept as a safety net — images should now all be Imgur URLs.
  */
 function stripBase64ForStorage(data) {
   const json = JSON.stringify(data);
   const stripped = json.replace(/"data:[^"]{0,20};base64,[^"]+"/g, '""');
-  try {
-    return JSON.parse(stripped);
-  } catch {
-    return data;
-  }
-}
-
-/**
- * Compress an image File to a JPEG data URL at reduced quality/size.
- */
-function compressImage(file, maxWidth = 800, quality = 0.72) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let { width, height } = img;
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-        canvas.width  = width;
-        canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
+  try { return JSON.parse(stripped); } catch { return data; }
 }
 
 async function saveLocalPreview() {
@@ -862,9 +836,9 @@ async function saveLocalPreview() {
     projects: serializeProjects()
   };
 
-  // Strip base64 images (too large for GitHub API) — keep URLs only
-  const publishData = stripBase64ForStorage(updatedData);
-  portfolioData = updatedData; // keep in memory
+  // Images are now Imgur URLs — no base64 stripping needed
+  const publishData = updatedData;
+  portfolioData = updatedData;
 
   // Push directly to GitHub
   await publishToGithub(publishData, ghToken);
@@ -1097,94 +1071,116 @@ window.FF_saveEnquiry = saveEnquiryLocally;
 
 /* ============================================================
    DRAG & DROP IMAGE UPLOAD HELPER
+   Images are uploaded to Imgur so they get a permanent public URL
+   that works on GitHub Pages (no base64 / no local paths).
    ============================================================ */
 
 /**
+ * Upload a File to Imgur anonymously and return the public URL.
+ */
+async function uploadToImgur(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const res = await fetch('https://api.imgur.com/3/image', {
+    method: 'POST',
+    headers: { Authorization: `Client-ID ${IMGUR_CLIENT_ID}` },
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error(`Imgur upload failed (${res.status})`);
+  const json = await res.json();
+  if (!json.success) throw new Error('Imgur rejected the upload');
+  return json.data.link; // permanent public URL e.g. https://i.imgur.com/xxxxx.jpg
+}
+
+/**
+ * Handle a file picked or dropped: upload to Imgur, then call applyImage(url).
+ * Shows uploading state on the zone while in progress.
+ */
+async function handleImageFile(file, zone, applyImage) {
+  if (!file || !file.type.startsWith('image/')) {
+    toast('Please choose an image file.', 'error');
+    return;
+  }
+
+  // Show uploading state
+  const label = zone.querySelector('.img-drop-label');
+  const oldLabel = label ? label.innerHTML : '';
+  if (label) label.innerHTML = '<span>Uploading…</span>';
+  zone.style.pointerEvents = 'none';
+  zone.style.opacity = '0.6';
+
+  try {
+    const url = await uploadToImgur(file);
+    applyImage(url);
+    toast('✓ Image uploaded!');
+  } catch (err) {
+    toast('Image upload failed: ' + err.message, 'error');
+    if (label) label.innerHTML = oldLabel;
+  } finally {
+    zone.style.pointerEvents = '';
+    zone.style.opacity = '';
+  }
+}
+
+/**
  * Bind a drag-and-drop upload zone.
- * @param {HTMLElement} zone  - the .img-drop-zone element
- * @param {HTMLInputElement} hiddenInput - the hidden input that stores the value
+ * @param {HTMLElement} zone
+ * @param {HTMLInputElement} hiddenInput - stores the final public URL
  */
 function bindDropZone(zone, hiddenInput) {
   if (!zone || !hiddenInput) return;
 
-  const fileInput  = zone.querySelector('input[type="file"]');
-  const preview    = zone.querySelector('.img-drop-preview');
-  const clearBtn   = zone.querySelector('.img-drop-clear');
+  const fileInput = zone.querySelector('input[type="file"]');
+  const preview   = zone.querySelector('.img-drop-preview');
+  const clearBtn  = zone.querySelector('.img-drop-clear');
 
   function applyImage(src) {
     hiddenInput.value = src;
-    if (preview) {
-      preview.src = src;
-      preview.classList.add('visible');
-    }
+    if (preview) { preview.src = src; preview.classList.add('visible'); }
     if (clearBtn) clearBtn.classList.add('visible');
   }
 
   function clearImage() {
     hiddenInput.value = '';
-    if (preview) {
-      preview.src = '';
-      preview.classList.remove('visible');
-    }
+    if (preview) { preview.src = ''; preview.classList.remove('visible'); }
     if (clearBtn) clearBtn.classList.remove('visible');
     if (fileInput) fileInput.value = '';
   }
 
-  // Populate preview if hidden input already has a value (on form load)
+  // Populate preview if value already set (on form load)
   if (hiddenInput.value) {
-    if (preview) {
-      preview.src = hiddenInput.value;
-      preview.classList.add('visible');
-    }
+    if (preview) { preview.src = hiddenInput.value; preview.classList.add('visible'); }
     if (clearBtn) clearBtn.classList.add('visible');
   }
 
-  // File chosen via the native picker
+  // File picker
   if (fileInput) {
     fileInput.addEventListener('change', () => {
       const file = fileInput.files[0];
-      if (!file) return;
-      compressImage(file).then(applyImage);
+      if (file) handleImageFile(file, zone, applyImage);
     });
   }
 
   // Drag events
-  zone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    zone.classList.add('drag-over');
-  });
-
-  zone.addEventListener('dragleave', (e) => {
-    if (!zone.contains(e.relatedTarget)) {
-      zone.classList.remove('drag-over');
-    }
-  });
-
+  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', (e) => { if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over'); });
   zone.addEventListener('drop', (e) => {
     e.preventDefault();
     zone.classList.remove('drag-over');
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      compressImage(file).then(applyImage);
-    } else {
-      toast('Please drop an image file.', 'error');
-    }
+    if (file) handleImageFile(file, zone, applyImage);
   });
 
-  // Keyboard accessibility
+  // Keyboard
   zone.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      if (fileInput) fileInput.click();
-    }
+    if ((e.key === 'Enter' || e.key === ' ') && fileInput) { e.preventDefault(); fileInput.click(); }
   });
 
-  // Clear button
+  // Clear
   if (clearBtn) {
-    clearBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      clearImage();
-    });
+    clearBtn.addEventListener('click', (e) => { e.stopPropagation(); clearImage(); });
   }
 }
 
