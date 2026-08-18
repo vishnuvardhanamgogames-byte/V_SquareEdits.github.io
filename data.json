@@ -210,6 +210,117 @@
           "desc": "The fully mastered 4K export, completed with theater-ready audio mixing and grading."
         }
       }
+    },
+    {
+      "index": "02",
+      "title": "Multifandom Cinematic Edit",
+      "category": "Music Editing / Transitions / VFX",
+      "role": "Editor / VFX",
+      "software": "Premiere Pro, After Effects",
+      "year": "2026",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+      "image": "https://images.unsplash.com/photo-1695192721582-5660bca08424?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MDV8MHwxfHNlYXJjaHwyfHxtdXNpYyUyMHZpZGVvJTIwYWVzdGhldGljfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85",
+      "description": "A music-driven montage stitched from dozens of sources into one continuous visual flow — match cuts, velocity ramps and seamless masked transitions synced to the track.",
+      "breakdown": {
+        "RAW": {
+          "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80",
+          "desc": "A mix of standard-definition and high-definition sources before aspect-ratio and resolution matching."
+        },
+        "EDIT": {
+          "image": "https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80",
+          "desc": "Stitching hundreds of clips using match cuts and visual speed ramps to form a continuous visual flow."
+        },
+        "COLOR": {
+          "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+          "desc": "A vibrant, stylized color grade to bring various visual sources into a single coherent visual palette."
+        },
+        "MOTION": {
+          "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
+          "desc": "Seamless invisible mask transitions and localized particle/light leak overlay effects."
+        },
+        "SOUND": {
+          "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80",
+          "desc": "Precision-synced audio beat mapping and vocal isolation/mixing from source tracks."
+        },
+        "FINAL": {
+          "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80",
+          "desc": "The fully rendered high-frame-rate master with smooth motion-blurred transitions."
+        }
+      }
+    },
+    {
+      "index": "03",
+      "title": "Motion Graphics Advertisement",
+      "category": "Editing / Motion Graphics / After Effects",
+      "role": "Motion Designer / Editor",
+      "software": "After Effects, Premiere Pro, Photoshop",
+      "year": "2025",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+      "image": "https://images.unsplash.com/photo-1532170579297-281918c8ae72?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2OTV8MHwxfHNlYXJjaHw0fHxjaW5lbWF0aWMlMjBwb3J0cmFpdCUyMGRhcmslMjBtb29kfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85",
+      "description": "A punchy 30-second product spot built entirely from animated typography, shape systems and rhythm — designed to land the message with the sound off.",
+      "breakdown": {
+        "RAW": {
+          "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80",
+          "desc": "Initial vector layouts and raw storyboard graphics designed in Adobe Illustrator."
+        },
+        "EDIT": {
+          "image": "https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80",
+          "desc": "Pacing typography overlays and setting up keyframe timings for fluid kinetic animations."
+        },
+        "COLOR": {
+          "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+          "desc": "Adjusting contrast and applying branding color LUTs for visual consistency across products."
+        },
+        "MOTION": {
+          "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
+          "desc": "Custom 3D camera paths, vector morphing, and complex shape layer transitions in After Effects."
+        },
+        "SOUND": {
+          "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80",
+          "desc": "Synchronized cartoon sound effects, clicks, and a dynamic upbeat background music track."
+        },
+        "FINAL": {
+          "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80",
+          "desc": "The compressed 1080p MP4 final deliverable optimized for web and social media ad placements."
+        }
+      }
+    },
+    {
+      "index": "04",
+      "title": "Social Media Campaign",
+      "category": "Short-form Editing / Typography / Sound Design",
+      "role": "Editor / Sound Designer",
+      "software": "Premiere Pro, After Effects, Audition",
+      "year": "2025",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+      "image": "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTV8MHwxfHNlYXJjaHwxfHxjb21tZXJjaWFsJTIwZmlsbSUyMGNvbG9yJTIwZ3JhZGluZ3xlbnwwfHx8fDE3ODY2MTM2Nzh8MA&ixlib=rb-4.1.0&q=85",
+      "description": "A 12-piece short-form series engineered for retention — hooks inside the first second, burned-in kinetic captions and sound design that carries the scroll-stopping energy.",
+      "breakdown": {
+        "RAW": {
+          "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80",
+          "desc": "Vertical smartphone clips and raw interview takes captured under varied lighting environments."
+        },
+        "EDIT": {
+          "image": "https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80",
+          "desc": "Aggressive hook-based pacing to optimize audience retention within the first three seconds."
+        },
+        "COLOR": {
+          "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+          "desc": "High-contrast correction to make the subjects stand out on mobile screens and feeds."
+        },
+        "MOTION": {
+          "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
+          "desc": "Bold, branded kinetic captions and pop-up vector elements for increased visual engagement."
+        },
+        "SOUND": {
+          "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80",
+          "desc": "Clean dialogue equalization, noise reduction, and ducked trending background audio tracks."
+        },
+        "FINAL": {
+          "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80",
+          "desc": "Vertical 9:16 final deliverable, optimized and formatted for social platform algorithms."
+        }
+      }
     }
   ]
 }
