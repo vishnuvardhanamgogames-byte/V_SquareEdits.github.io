@@ -12,7 +12,7 @@
     "subtext": "Video Editor & Motion Designer specializing in cinematic edits, social content, motion graphics and visual storytelling.",
     "availability": "2026",
     "showreelVideo": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    "showreelPoster": "public/images/projects/hero_workspace.jpg",
+    "showreelPoster": "",
     "showreelDuration": "01:00"
   },
   "marquee": [
