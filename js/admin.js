@@ -266,8 +266,58 @@ async function apiFetch(path, options = {}) {
 }
 
 /* ============================================================
-   VIEWS CONTROL
+   GITHUB TOKEN — persistent storage helpers
    ============================================================ */
+const GH_TOKEN_KEY = 'ff_gh_token';
+
+function getStoredToken() {
+  return localStorage.getItem(GH_TOKEN_KEY) || '';
+}
+
+function saveToken(t) {
+  localStorage.setItem(GH_TOKEN_KEY, t.trim());
+}
+
+function clearToken() {
+  localStorage.removeItem(GH_TOKEN_KEY);
+}
+
+/** Update the token UI: show "connected" state or the input form */
+function refreshTokenUI() {
+  const token      = getStoredToken();
+  const setupEl    = $('ghTokenSetup');
+  const connEl     = $('ghTokenConnected');
+  if (!setupEl || !connEl) return;
+  if (token) {
+    setupEl.style.display   = 'none';
+    connEl.style.display    = 'flex';
+  } else {
+    setupEl.style.display   = 'flex';
+    connEl.style.display    = 'none';
+  }
+}
+
+/* ============================================================
+   PUBLISH STATUS BAR
+   ============================================================ */
+function showPublishBar(icon, text, showLink = false) {
+  const bar     = $('publishStatusBar');
+  const iconEl  = $('publishStatusIcon');
+  const textEl  = $('publishStatusText');
+  const linkEl  = $('publishViewLink');
+  if (!bar) return;
+  bar.style.display  = 'flex';
+  if (iconEl) iconEl.textContent = icon;
+  if (textEl) textEl.textContent = text;
+  if (linkEl) linkEl.style.display = showLink ? 'inline' : 'none';
+}
+
+function hidePublishBar() {
+  const bar = $('publishStatusBar');
+  if (bar) bar.style.display = 'none';
+}
+
+
 function showLogin() {
   $('loginPage').style.display = 'flex';
   $('dashboard').style.display = 'none';
@@ -276,8 +326,7 @@ function showLogin() {
 function showDashboard() {
   $('loginPage').style.display = 'none';
   $('dashboard').style.display = 'block';
-  
-  // Default to profile tab on login
+  refreshTokenUI();
   switchTab('profile');
 }
 
@@ -879,9 +928,13 @@ async function saveLocalPreview() {
     return;
   }
 
-  // Save token to localstorage
-  const ghToken = $('editGithubToken') ? $('editGithubToken').value.trim() : '';
-  if (ghToken) localStorage.setItem('ff_gh_token', ghToken);
+  // Get stored GitHub token — set once, remembered forever
+  const ghToken = getStoredToken();
+  if ($('editGithubToken') && !ghToken) {
+    // token input visible — pick up whatever is typed
+    const typed = $('editGithubToken').value.trim();
+    if (typed) saveToken(typed);
+  }
 
   // Helper to safely get input value
   const val = (id) => { const el = $(id); return el ? el.value.trim() : ''; };
@@ -953,90 +1006,86 @@ async function saveLocalPreview() {
   };
 
   try {
-    // Strip large base64 data URLs before saving to localStorage to avoid QuotaExceededError.
-    // Images uploaded via drag-and-drop are kept in memory (portfolioData) for live preview
-    // but only URLs/paths (not raw base64) are persisted.
     const storableData = stripBase64ForStorage(updatedData);
     localStorage.setItem('portfolio_data', JSON.stringify(storableData));
-    portfolioData = updatedData; // keep full data (incl. base64) in memory
-    // Write data.json directly to disk (File System Access API) or download as fallback
+    portfolioData = updatedData;
     writeDataJsonToDisk(storableData);
   } catch (e) {
-    // If still too large even after stripping (shouldn't happen), just keep in memory
     portfolioData = updatedData;
-    toast('Saved in session. Data too large for browser storage — use GitHub publish to persist.', 'error');
   }
 
-  // Trigger GitHub commit if token is configured
-  if (ghToken) {
-    await publishToGithub(updatedData, ghToken);
+  // Always auto-publish to GitHub if a token is stored
+  const token = getStoredToken();
+  if (token) {
+    await publishToGithub(updatedData, token);
   } else {
-    toast('Saved locally. Add a GitHub Token to publish live.', 'error');
+    toast('Saved locally. Paste your GitHub Token above to publish live automatically.', 'error');
   }
 }
 
 
 async function publishToGithub(updatedData, token) {
-  const statusAlert = $('publishStatusAlert');
-  if (statusAlert) { statusAlert.style.display = 'none'; }
+  showPublishBar('⏳', 'Publishing to GitHub…');
 
   try {
     const owner = 'vishnuvardhanamgogames-byte';
-    const repo = 'V_SquareEdits.github.io';
-    const path = 'data.json';
+    const repo  = 'V_SquareEdits.github.io';
+    const path  = 'data.json';
 
-    // 1. Get the current file details to retrieve the SHA
-    const getUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-    const getRes = await fetch(getUrl, {
-      headers: {
-        'Authorization': `token ${token}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
+    // 1. Get current SHA of data.json
+    const getRes = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
+      { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } }
+    );
 
     if (!getRes.ok) {
-      throw new Error(`Failed to contact GitHub (${getRes.status}). Please check your token or token permissions.`);
+      if (getRes.status === 401) {
+        clearToken();
+        refreshTokenUI();
+        throw new Error('GitHub token is invalid or expired. Please paste a new token.');
+      }
+      throw new Error(`GitHub error ${getRes.status} — check your token permissions.`);
     }
 
-    const fileData = await getRes.json();
-    const sha = fileData.sha;
+    const { sha } = await getRes.json();
 
-    // 2. Put the new JSON content
-    const putUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-    // Safe Base64 encoding supporting unicode characters
-    const jsonString = JSON.stringify(updatedData, null, 2);
-    const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
-    
-    const putRes = await fetch(putUrl, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `token ${token}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: 'Update portfolio configuration via Admin CMS',
-        content: contentBase64,
-        sha: sha,
-        branch: 'main'
-      })
-    });
+    // 2. Write updated data.json (strip base64 so file stays small)
+    const payload     = stripBase64ForStorage(updatedData);
+    const jsonString  = JSON.stringify(payload, null, 2);
+    const contentB64  = btoa(unescape(encodeURIComponent(jsonString)));
+
+    const putRes = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'Admin CMS update',
+          content: contentB64,
+          sha,
+          branch: 'main'
+        })
+      }
+    );
 
     if (!putRes.ok) {
-      const errBody = await putRes.json().catch(() => ({}));
-      throw new Error(errBody.message || `Failed to write file on GitHub (${putRes.status}).`);
+      const err = await putRes.json().catch(() => ({}));
+      throw new Error(err.message || `GitHub write failed (${putRes.status}).`);
     }
 
-    // Success!
-    toast('Published live to GitHub!');
-    statusAlert.style.display = 'block';
-    statusAlert.scrollIntoView({ behavior: 'smooth' });
+    // Success
+    showPublishBar('✅', 'Published! Site updates in ~60 seconds.', true);
+    toast('✓ Published to GitHub — site will update in ~1 minute.');
+    setTimeout(hidePublishBar, 8000);
 
   } catch (err) {
-    console.error(err);
+    showPublishBar('❌', err.message || 'Publish failed.');
     toast(err.message || 'Failed to publish to GitHub.', 'error');
-  } finally {
-    // no button state to restore in new UI
+    setTimeout(hidePublishBar, 10000);
   }
 }
 
@@ -1328,6 +1377,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Logout ─────────────────────────────────────────────────
   $('logoutBtn').addEventListener('click', logout);
+
+  // ── GitHub Token — save / clear ────────────────────────────
+  const saveTokenBtn = $('saveGhTokenBtn');
+  if (saveTokenBtn) {
+    saveTokenBtn.addEventListener('click', () => {
+      const input = $('editGithubToken');
+      const t = input ? input.value.trim() : '';
+      if (!t) { toast('Please paste your GitHub token first.', 'error'); return; }
+      saveToken(t);
+      refreshTokenUI();
+      toast('✓ GitHub token saved — all saves will now publish live automatically.');
+    });
+  }
+
+  const clearTokenBtn = $('clearGhTokenBtn');
+  if (clearTokenBtn) {
+    clearTokenBtn.addEventListener('click', () => {
+      clearToken();
+      refreshTokenUI();
+      const input = $('editGithubToken');
+      if (input) input.value = '';
+      toast('GitHub token cleared.');
+    });
+  }
 
   // ── Connect data.json file for auto-save ──────────────────
   const connectBtn = $('connectFileBtn');
