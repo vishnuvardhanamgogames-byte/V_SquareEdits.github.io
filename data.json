@@ -12,7 +12,7 @@
     "subtext": "Video Editor & Motion Designer specializing in cinematic edits, social content, motion graphics and visual storytelling.",
     "availability": "2026",
     "showreelVideo": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    "showreelPoster": "public/images/projects/hero_workspace.jpg",
+    "showreelPoster": "",
     "showreelDuration": "01:00"
   },
   "marquee": [
@@ -182,7 +182,7 @@
       "software": "Premiere Pro, DaVinci Resolve, Audition",
       "year": "2026",
       "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-      "image": "https://images.unsplash.com/photo-1771038396898-50c5bbbbfa67?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHw0fHxzcG9ydHMlMjBjYXIlMjBjb21tZXJjaWFsJTIwY2luZW1hdGljfGVufDB8fHx8MTc4NjYxMzY5Mnww&ixlib=rb-4.1.0&q=85",
+      "image": "",
       "description": "A high-energy trailer cut built around rhythm and restraint — every beat mapped to the music, every transition earned. Graded for a cold, filmic finish with deep blacks and controlled highlights.",
       "breakdown": {
         "RAW": {
