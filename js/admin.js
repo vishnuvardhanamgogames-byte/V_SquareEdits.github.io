@@ -436,31 +436,20 @@ async function deleteEnquiry(id) {
    CMS WEBSITE EDITOR CONTROL
    ============================================================ */
 async function loadCMSData() {
-  // 1. LocalStorage
+  // Always fetch fresh data.json from GitHub (bypass stale localStorage)
   try {
-    const local = localStorage.getItem('portfolio_data');
-    if (local) {
-      portfolioData = JSON.parse(local);
+    const res = await fetch('data.json?v=' + Date.now());
+    if (res.ok) {
+      portfolioData = await res.json();
     }
   } catch (_) {}
 
-  // 2. Fetch data.json
-  if (!portfolioData) {
-    try {
-      const res = await fetch('data.json');
-      if (res.ok) {
-        portfolioData = await res.json();
-      }
-    } catch (_) {}
-  }
-
-  // 3. Fallback
+  // Fallback to defaults if fetch failed
   if (!portfolioData) {
     portfolioData = DEFAULT_PORTFOLIO_DATA;
   }
 
   populateEditorForm();
-  // Re-wire drop zones after values are set so existing images show as previews
   setTimeout(() => initImageDropZones(), 0);
 }
 
@@ -949,6 +938,10 @@ async function publishToGithub(updatedData, token) {
     }
 
     toast('🚀 Published! Live site updates in ~1 minute.');
+
+    // Clear stale localStorage so the site always reads fresh data from GitHub
+    localStorage.removeItem('portfolio_data');
+
     if (statusAlert) {
       statusAlert.style.display = 'block';
       statusAlert.scrollIntoView({ behavior: 'smooth' });
@@ -1349,22 +1342,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Reset to Server Database ─────────────────────────────
   $('resetToDefaultBtn').addEventListener('click', async () => {
-    if (confirm('Are you sure you want to discard your local preview and reset all details from your GitHub database?')) {
+    if (confirm('Reset all content from GitHub? Any unsaved changes will be lost.')) {
       try {
         const res = await fetch(`data.json?v=${Date.now()}`);
         if (res.ok) {
-          const freshData = await res.json();
-          localStorage.setItem('portfolio_data', JSON.stringify(freshData));
-          portfolioData = freshData;
+          portfolioData = await res.json();
+          localStorage.removeItem('portfolio_data');
           populateEditorForm();
           setTimeout(() => initImageDropZones(), 0);
-          toast('Successfully reset and synced all details from GitHub!');
+          toast('Reset from GitHub successfully!');
         } else {
-          throw new Error('Failed to retrieve data.json from server.');
+          throw new Error('Could not fetch data.json');
         }
       } catch (err) {
-        console.error(err);
-        toast('Failed to sync details from GitHub.', 'error');
+        toast('Failed to reset: ' + err.message, 'error');
       }
     }
   });

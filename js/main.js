@@ -273,29 +273,27 @@ function escapeHtml(str) {
    DATA LOADING & POPULATING
    ============================================================ */
 async function initPortfolioData() {
-  // 1. Try LocalStorage for preview edits
+  // Always fetch fresh data.json from server first (bypasses stale localStorage cache)
   try {
-    const local = localStorage.getItem('portfolio_data');
-    if (local) {
-      window.portfolioData = JSON.parse(local);
+    const res = await fetch('data.json?v=' + Date.now());
+    if (res.ok) {
+      window.portfolioData = await res.json();
     }
   } catch (e) {
-    console.error('Failed to read from localStorage', e);
+    console.warn('data.json fetch failed, trying localStorage', e);
   }
 
-  // 2. Try Fetch data.json
+  // Fallback: try localStorage if fetch failed (e.g. offline)
   if (!window.portfolioData) {
     try {
-      const res = await fetch('data.json');
-      if (res.ok) {
-        window.portfolioData = await res.json();
-      }
+      const local = localStorage.getItem('portfolio_data');
+      if (local) window.portfolioData = JSON.parse(local);
     } catch (e) {
-      console.warn('data.json not found, using defaults', e);
+      console.error('localStorage read failed', e);
     }
   }
 
-  // 3. Fallback to hardcoded defaults
+  // Final fallback: hardcoded defaults
   if (!window.portfolioData) {
     window.portfolioData = DEFAULT_PORTFOLIO_DATA;
   }
